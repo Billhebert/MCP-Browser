@@ -7,8 +7,8 @@ export const smokeTestTool: ToolDefinition = {
   description:
     "Executar teste de fumaça em múltiplas URLs. Para cada URL, navega, verifica status HTTP, busca texto opcional e tira screenshot. Retorna relatório completo com pass/fail por página.",
   args: {
-    urls: z.string().describe("JSON array de objetos: [{\"url\":\"https://...\",\"expectedText\":\"opcional\",\"expectedStatus\":200}]"),
-    screenshotOnFail: z.string().optional().describe("Se 'true', captura screenshot em caso de falha"),
+    urls: z.string().max(5000).describe("JSON array de objetos: [{\"url\":\"https://...\",\"expectedText\":\"opcional\",\"expectedStatus\":200}]"),
+    screenshotOnFail: z.string().max(5000).optional().describe("Se 'true', captura screenshot em caso de falha"),
   },
   async execute(args: { urls: string; screenshotOnFail?: string }) {
     const page = await getPage();
@@ -33,7 +33,7 @@ export const smokeTestTool: ToolDefinition = {
         const loadTime = Date.now() - start;
         const httpStatus = response?.status() || null;
         const title = await page.title();
-        const bodyText = await page.evaluate(() => document.body.innerText);
+        const bodyText = await page.evaluate(() => document.body.textContent);
 
         const errors: string[] = [];
         if (target.expectedStatus && httpStatus !== target.expectedStatus) {

@@ -19,10 +19,10 @@ export const emulateDeviceTool: ToolDefinition = {
   description:
     "Emular um dispositivo específico: ajusta viewport, user agent e touch support. Presets: iphone-14, iphone-se, pixel-7, samsung-s23, ipad-air, ipad-pro, desktop-1080, desktop-1440, macbook-pro. Ou especifique valores customizados.",
   args: {
-    device: z.string().optional().describe("Nome do preset: iphone-14, iphone-se, pixel-7, samsung-s23, ipad-air, ipad-pro, desktop-1080, desktop-1440, macbook-pro"),
-    width: z.string().optional().describe("Largura em px (usado com height se device não especificado)"),
-    height: z.string().optional().describe("Altura em px"),
-    userAgent: z.string().optional().describe("User agent string customizado"),
+    device: z.string().max(100).optional().describe("Nome do preset: iphone-14, iphone-se, pixel-7, samsung-s23, ipad-air, ipad-pro, desktop-1080, desktop-1440, macbook-pro"),
+    width: z.string().max(100).optional().describe("Largura em px (usado com height se device não especificado)"),
+    height: z.string().max(100).optional().describe("Altura em px"),
+    userAgent: z.string().max(100).optional().describe("User agent string customizado"),
   },
   async execute(args: { device?: string; width?: string; height?: string; userAgent?: string }) {
     const page = await getPage();

@@ -7,7 +7,7 @@ export const checkAccessibilityTreeTool: ToolDefinition = {
   description:
     "Testar navegação por teclado na página atual. Varre elementos focusáveis (Tab), verifica ordem lógica, detecta focus traps, elementos sem foco visível, e falta de skip-links. Não modifica a página.",
   args: {
-    maxTabs: z.string().optional().describe("Número máximo de tabs a testar (padrão: 30)"),
+    maxTabs: z.string().max(5000).optional().describe("Número máximo de tabs a testar (padrão: 30)"),
   },
   async execute(args: { maxTabs?: string }) {
     const page = await getPage();

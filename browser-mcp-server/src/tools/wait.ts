@@ -11,7 +11,7 @@ export const waitTool: ToolDefinition = {
   args: {
     type: z.enum(waitTypes).describe("Tipo de espera: 'load', 'selector', 'url', 'timeout'"),
     value: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe(
         "Valor para a espera: seletor CSS para 'selector', URL para 'url', ms para 'timeout'. Obrigatório exceto para 'load'.",

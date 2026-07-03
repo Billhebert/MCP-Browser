@@ -22,7 +22,7 @@ export const saveSnapshotTool: ToolDefinition = {
   description:
     "Salvar um snapshot (foto) do estado atual da página: URL, título, texto visível e screenshot. O snapshot fica armazenado em memória.",
   args: {
-    name: z.string().optional().describe("Nome opcional para identificar o snapshot"),
+    name: z.string().max(500).optional().describe("Nome opcional para identificar o snapshot"),
   },
   async execute({ name }: { name?: string }) {
     const page = await getPage();
@@ -33,7 +33,7 @@ export const saveSnapshotTool: ToolDefinition = {
       name: snapshotName,
       title: await page.title(),
       url: page.url(),
-      text: await page.evaluate(() => document.body.innerText).catch(() => ""),
+      text: await page.evaluate(() => document.body.textContent).catch(() => ""),
       screenshot: (await page.screenshot({ type: "png" })).toString("base64"),
       timestamp: Date.now(),
     };
@@ -82,7 +82,7 @@ export const restoreSnapshotTool: ToolDefinition = {
   description:
     "Restaurar um snapshot salvo: navega para a URL, verifica se o título e texto conferem, e retorna o screenshot para comparação visual.",
   args: {
-    name: z.string().describe("Nome do snapshot salvo anteriormente"),
+    name: z.string().max(500).describe("Nome do snapshot salvo anteriormente"),
   },
   async execute({ name }: { name: string }) {
     const data = snapshotsStore.get(name);
@@ -98,7 +98,7 @@ export const restoreSnapshotTool: ToolDefinition = {
 
     await page.goto(data.url, { waitUntil: "networkidle" });
     const currentTitle = await page.title();
-    const currentText = await page.evaluate(() => document.body.innerText).catch(() => "");
+    const currentText = await page.evaluate(() => document.body.textContent).catch(() => "");
 
     const titleMatch = currentTitle === data.title;
     const textSimilarity = currentText.length > 0 && data.text.length > 0

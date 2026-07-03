@@ -7,7 +7,7 @@ export const checkCacheTool: ToolDefinition = {
   description:
     "Auditar headers de cache dos recursos carregados na página atual. Verifica Cache-Control, Expires, ETag, Last-Modified, e identifica recursos sem cache ou com cache muito curto.",
   args: {
-    minCacheSeconds: z.string().optional().describe("Cache mínimo aceitável em segundos (padrão: 86400 = 1 dia)"),
+    minCacheSeconds: z.string().max(100).optional().describe("Cache mínimo aceitável em segundos (padrão: 86400 = 1 dia)"),
   },
   async execute(args: { minCacheSeconds?: string }) {
     const networkLogs = getNetworkLogs();

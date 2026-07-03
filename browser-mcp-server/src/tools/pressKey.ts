@@ -20,7 +20,7 @@ export const pressKeyTool: ToolDefinition = {
   args: {
     key: z.enum(KEY_NAMES as [string, ...string[]]).describe("Tecla a pressionar (ex: 'Enter', 'Escape', 'Tab', 'ArrowDown')"),
     selector: z
-      .string()
+      .string().max(2000)
       .optional()
       .describe("Seletor CSS opcional. Se omitido, pressiona no elemento ativo."),
   },

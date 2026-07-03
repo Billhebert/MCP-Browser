@@ -7,7 +7,7 @@ export const checkConsoleErrorsTool: ToolDefinition = {
   description:
     "Analisar erros do console do navegador na página atual. Categoriza por tipo (JS error, warning, network, promise rejection, React error), agrupa por mensagem, e classifica por severidade.",
   args: {
-    clear: z.string().optional().describe("Se 'true', limpa os logs após análise"),
+    clear: z.string().max(5000).optional().describe("Se 'true', limpa os logs após análise"),
   },
   async execute(args: { clear?: string }) {
     const page = await getPage();

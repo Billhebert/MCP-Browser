@@ -7,12 +7,12 @@ export const scheduleAuditTool: ToolDefinition = {
   description:
     "Agendar auditorias recorrentes via cron simplificado. Suporta formato: 'minuto hora' (ex: '0 9' = 09:00, '* 8' = toda hora entre 8-9). Lista, adiciona, remove e ativa/desativa agendamentos. Schedules são verificados a cada 30s.",
   args: {
-    action: z.string().describe("Ação: 'add', 'list', 'remove', 'toggle'"),
-    tool: z.string().optional().describe("Nome da tool para agendar (obrigatório para add)"),
-    cron: z.string().optional().describe("Expressão cron simplificada: 'minuto hora', ex: '0 9' para 09:00, '30 14' para 14:30"),
-    args: z.string().optional().describe("JSON string com argumentos da tool (opcional)"),
-    id: z.string().optional().describe("ID do schedule (obrigatório para remove/toggle)"),
-    enabled: z.string().optional().describe("Ativar/desativar: 'true' ou 'false' (para toggle)"),
+    action: z.string().max(100).describe("Ação: 'add', 'list', 'remove', 'toggle'"),
+    tool: z.string().max(500).optional().describe("Nome da tool para agendar (obrigatório para add)"),
+    cron: z.string().max(500).optional().describe("Expressão cron simplificada: 'minuto hora', ex: '0 9' para 09:00, '30 14' para 14:30"),
+    args: z.string().max(50000).optional().describe("JSON string com argumentos da tool (opcional)"),
+    id: z.string().max(500).optional().describe("ID do schedule (obrigatório para remove/toggle)"),
+    enabled: z.string().max(5000).optional().describe("Ativar/desativar: 'true' ou 'false' (para toggle)"),
   },
   async execute(args: { action: string; tool?: string; cron?: string; args?: string; id?: string; enabled?: string }) {
     switch (args.action) {

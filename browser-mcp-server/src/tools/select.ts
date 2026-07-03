@@ -6,8 +6,8 @@ export const selectTool: ToolDefinition = {
   name: "select",
   description: "Selecionar uma opção em um elemento <select>.",
   args: {
-    selector: z.string().describe("Seletor CSS do elemento <select>"),
-    value: z.string().describe("Valor da option a ser selecionada"),
+    selector: z.string().max(2000).describe("Seletor CSS do elemento <select>"),
+    value: z.string().max(5000).describe("Valor da option a ser selecionada"),
   },
   async execute({ selector, value }: { selector: string; value: string }) {
     console.error(`📋 Selecionando: ${selector} = "${value}"`);

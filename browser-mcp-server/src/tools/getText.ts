@@ -8,7 +8,7 @@ export const getTextTool: ToolDefinition = {
     "Extrair o texto visível da página toda ou de um elemento específico. Retorna até 5000 caracteres.",
   args: {
     selector: z
-      .string()
+      .string().max(2000)
       .optional()
       .describe("Seletor CSS opcional. Se omitido, extrai o texto da página inteira."),
   },
@@ -26,7 +26,7 @@ export const getTextTool: ToolDefinition = {
       }
       text = (await el.textContent()) || "";
     } else {
-      text = await page.evaluate(() => document.body.innerText);
+      text = await page.evaluate(() => document.body.textContent);
     }
     const truncated = text.slice(0, 5000);
     console.error(`✅ Texto extraído: ${truncated.length} caracteres`);

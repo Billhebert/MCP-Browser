@@ -21,9 +21,9 @@ export const explainIssueTool: ToolDefinition = {
   description:
     "Explicar um issue técnico em linguagem simples. Recebe o JSON de um issue (type, severity, message) e retorna explicação em português claro, impacto, e sugestão de prioridade.",
   args: {
-    type: z.string().describe("Tipo do issue (ex: 'csp', 'contrast', 'missing alt')"),
-    message: z.string().optional().describe("Mensagem do issue para contexto adicional"),
-    severity: z.string().optional().describe("Severidade (high, medium, low)"),
+    type: z.string().max(100).describe("Tipo do issue (ex: 'csp', 'contrast', 'missing alt')"),
+    message: z.string().max(5000).optional().describe("Mensagem do issue para contexto adicional"),
+    severity: z.string().max(100).optional().describe("Severidade (high, medium, low)"),
   },
   async execute(args: { type: string; message?: string; severity?: string }) {
     const { type, message, severity } = args;

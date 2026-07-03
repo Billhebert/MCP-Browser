@@ -9,10 +9,10 @@ export const uploadFileTool: ToolDefinition = {
   description: "Fazer upload de um arquivo em um campo input[type=file].",
   args: {
     selector: z
-      .string()
+      .string().max(2000)
       .describe("Seletor CSS do input[type=file] (ex: '#file-upload', 'input[type=\"file\"]')"),
     filePath: z
-      .string()
+      .string().max(2000)
       .describe("Caminho absoluto do arquivo no sistema (ex: '/home/user/documento.pdf')"),
   },
   async execute({ selector, filePath }: { selector: string; filePath: string }) {

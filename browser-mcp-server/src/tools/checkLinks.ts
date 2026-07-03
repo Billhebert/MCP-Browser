@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { ToolDefinition } from "../index.js";
 import { getPage, getConsoleLogs } from "../browser.js";
+import { isSafeUrl } from "../corporate/ssrf.js";
 
 function isLikelyValid(url: string): boolean {
   if (
@@ -38,12 +39,12 @@ export const checkLinksTool: ToolDefinition = {
     "Verificar links quebrados na página atual. Escaneia todos <a href>, faz requisição HEAD para cada um, e reporta 4xx/5xx/redirects. Opcionalmente verifica links externos e console errors.",
   args: {
     checkExternal: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe("Se 'true', verifica também links externos (padrão: apenas mesmo domínio)"),
-    maxChecks: z.string().optional().describe("Número máximo de links para verificar (padrão: 50)"),
+    maxChecks: z.string().max(100).optional().describe("Número máximo de links para verificar (padrão: 50)"),
     includeConsole: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe("Se 'true', inclui console errors/warnings da página no resultado"),
   },
@@ -90,6 +91,9 @@ export const checkLinksTool: ToolDefinition = {
 
       checked++;
       try {
+        const urlCheck = isSafeUrl(absolute);
+        if (!urlCheck.safe) continue; // skip unsafe URLs silently
+
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), 10000);
         const resp = await fetch(absolute, { method: "HEAD", signal: controller.signal });

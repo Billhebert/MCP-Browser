@@ -7,7 +7,7 @@ export const validateHtmlTool: ToolDefinition = {
   description:
     "Validar HTML da página atual contra o W3C Markup Validation Service. Envia o HTML para https://validator.w3.org/nu/ e retorna erros, avisos e informações. Limite: ~300KB de HTML.",
   args: {
-    parser: z.string().optional().describe("Parser: 'html' (padrão) ou 'xmldoc'"),
+    parser: z.string().max(5000).optional().describe("Parser: 'html' (padrão) ou 'xmldoc'"),
   },
   async execute(args: { parser?: string }) {
     const page = await getPage();

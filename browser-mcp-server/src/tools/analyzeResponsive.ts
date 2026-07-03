@@ -7,7 +7,7 @@ export const analyzeResponsiveTool: ToolDefinition = {
   description:
     "Testar responsividade da página atual em múltiplos viewports. Tira screenshots em cada tamanho especificado e retorna como imagens base64 com metadados.",
   args: {
-    viewports: z.string().optional().describe("JSON array de viewports: [{\"width\":375,\"height\":667,\"name\":\"mobile\"}, ...]. Padrão: mobile(375x667), tablet(768x1024), desktop(1440x900)"),
+    viewports: z.string().max(50000).optional().describe("JSON array de viewports: [{\"width\":375,\"height\":667,\"name\":\"mobile\"}, ...]. Padrão: mobile(375x667), tablet(768x1024), desktop(1440x900)"),
   },
   async execute(args: { viewports?: string }) {
     const page = await getPage();

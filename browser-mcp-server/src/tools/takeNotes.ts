@@ -7,10 +7,10 @@ export const takeNotesTool: ToolDefinition = {
   description:
     "Adicionar anotações e comentários a issues de auditoria. Útil para workflow corporativo: QA anota issue, dev responde, lead aprova. Suporta adicionar, listar por issue, e listar todos os issues com anotações.",
   args: {
-    action: z.string().describe("Ação: 'add' (adicionar nota), 'get' (ver notas de um issue), 'list' (listar todos issues com notas)"),
-    issueKey: z.string().optional().describe("Chave única do issue (ex: 'seo-001', 'contrast-header'). Use type + número ou descrição curta."),
-    author: z.string().optional().describe("Nome de quem está anotando (obrigatório para add)"),
-    text: z.string().optional().describe("Texto da anotação (obrigatório para add)"),
+    action: z.string().max(100).describe("Ação: 'add' (adicionar nota), 'get' (ver notas de um issue), 'list' (listar todos issues com notas)"),
+    issueKey: z.string().max(500).optional().describe("Chave única do issue (ex: 'seo-001', 'contrast-header'). Use type + número ou descrição curta."),
+    author: z.string().max(500).optional().describe("Nome de quem está anotando (obrigatório para add)"),
+    text: z.string().max(5000).optional().describe("Texto da anotação (obrigatório para add)"),
   },
   async execute(args: { action: string; issueKey?: string; author?: string; text?: string }) {
     switch (args.action) {

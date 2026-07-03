@@ -7,8 +7,8 @@ export const dragAndDropTool: ToolDefinition = {
   description:
     "Arrastar um elemento e soltar sobre outro. Útil para Kanban (mover cards entre colunas), reordenar listas, etc.",
   args: {
-    source: z.string().describe("Seletor CSS do elemento a ser arrastado"),
-    target: z.string().describe("Seletor CSS do elemento de destino (onde soltar)"),
+    source: z.string().max(2000).describe("Seletor CSS do elemento a ser arrastado"),
+    target: z.string().max(2000).describe("Seletor CSS do elemento de destino (onde soltar)"),
   },
   async execute({ source, target }: { source: string; target: string }) {
     const page = await getPage();

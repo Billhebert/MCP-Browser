@@ -1,10 +1,14 @@
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-
 const ANNOTATIONS = new Map<string, Array<{ author: string; text: string; createdAt: string }>>();
 
 const SCHEDULES: Array<{ id: string; cron: string; tool: string; args: Record<string, unknown>; lastRun: number; enabled: boolean }> = [];
 let scheduleCounter = 0;
+
+type ToolExecutor = (name: string, args: Record<string, unknown>) => Promise<void>;
+let toolExecutor: ToolExecutor | null = null;
+
+export function setToolExecutor(executor: ToolExecutor): void {
+  toolExecutor = executor;
+}
 
 export function addAnnotation(issueKey: string, author: string, text: string): void {
   if (!ANNOTATIONS.has(issueKey)) ANNOTATIONS.set(issueKey, []);
@@ -56,10 +60,15 @@ export async function checkSchedules(): Promise<void> {
     const scheduleMinute = now - schedule.lastRun > 60000;
     if (currentMinute === minute && currentHour === hour && scheduleMinute) {
       schedule.lastRun = now;
-      try {
-        console.error(`[Scheduler] Running ${schedule.tool}`);
-      } catch (e) {
-        console.error(`[Scheduler] Failed ${schedule.tool}: ${(e as Error).message}`);
+      if (toolExecutor) {
+        try {
+          await toolExecutor(schedule.tool, schedule.args);
+          console.error(`[Scheduler] Executed ${schedule.tool}`);
+        } catch (e) {
+          console.error(`[Scheduler] Failed ${schedule.tool}: ${(e as Error).message}`);
+        }
+      } else {
+        console.error(`[Scheduler] No tool executor registered, skipping ${schedule.tool}`);
       }
     }
   }

@@ -7,7 +7,7 @@ export const clickTool: ToolDefinition = {
   description:
     "Clicar em um elemento da página usando seletor CSS. Se o clique normal falhar, tenta clique programático via JavaScript. Use force=true para ignorar verificações de visibility/enabled.",
   args: {
-    selector: z.string().describe("Seletor CSS do elemento (ex: '#btn-login', '.menu-item', 'button:has-text(\"Kanban\")')"),
+    selector: z.string().max(2000).describe("Seletor CSS do elemento (ex: '#btn-login', '.menu-item', 'button:has-text(\"Kanban\")')"),
     force: z
       .boolean()
       .optional()

@@ -8,10 +8,10 @@ export const setLocalStorageTool: ToolDefinition = {
     "Definir valores no localStorage do navegador antes de carregar uma página. Útil para configurar tokens, preferências ou flags de feature.",
   args: {
     items: z
-      .record(z.string())
+      .record(z.string().max(50000))
       .describe("Objeto chave-valor para definir no localStorage (ex: { 'token': 'abc', 'theme': 'dark' })"),
     url: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe(
         "URL para navegar primeiro (necessário para definir localStorage de um domínio específico)",

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { ToolDefinition } from "../index.js";
 import { getContext } from "../browser.js";
+import { isSafeUrl } from "../corporate/ssrf.js";
 
 function normalizeUrl(raw: string): string {
   try {
@@ -32,6 +33,9 @@ function matchesInclude(url: string, patterns: string[]): boolean {
 
 async function fetchSitemapXml(url: string, signal?: AbortSignal): Promise<string[]> {
   try {
+    const urlCheck = isSafeUrl(url);
+    if (!urlCheck.safe) return [];
+
     const res = await fetch(url, { signal });
     if (!res.ok) return [];
     const xml = await res.text();
@@ -52,12 +56,12 @@ export const crawlPagesTool: ToolDefinition = {
   description:
     "Descobrir e navegar por URLs de um site. Primeiro tenta sitemap.xml, depois robots.txt, depois crawling ao vivo (segue links). Usa abas do navegador atual. Útil para mapear o site que você está navegando.",
   args: {
-    url: z.string().optional().describe("URL para começar o crawl (padrão: URL atual)"),
-    maxDepth: z.string().optional().describe("Profundidade máxima de navegação (padrão: 2)"),
-    maxPages: z.string().optional().describe("Número máximo de páginas para visitar (padrão: 10)"),
-    exclude: z.string().optional().describe("Padrões de URL para excluir (separados por vírgula)"),
-    include: z.string().optional().describe("Padrões de URL para incluir (separados por vírgula)"),
-    sitemap: z.string().optional().describe("Se 'false', pula sitemap.xml (padrão: true)"),
+    url: z.string().max(5000).optional().describe("URL para começar o crawl (padrão: URL atual)"),
+    maxDepth: z.string().max(100).optional().describe("Profundidade máxima de navegação (padrão: 2)"),
+    maxPages: z.string().max(100).optional().describe("Número máximo de páginas para visitar (padrão: 10)"),
+    exclude: z.string().max(100).optional().describe("Padrões de URL para excluir (separados por vírgula)"),
+    include: z.string().max(100).optional().describe("Padrões de URL para incluir (separados por vírgula)"),
+    sitemap: z.string().max(5000).optional().describe("Se 'false', pula sitemap.xml (padrão: true)"),
   },
   async execute(args: {
     url?: string;

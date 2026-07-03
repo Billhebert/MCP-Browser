@@ -7,8 +7,8 @@ export const mockApiTool: ToolDefinition = {
   description:
     "Interceptar e mockar requisições de API na página atual. Permite simular respostas de endpoints específicos sem chamá-los realmente. Útil para testar cenários de erro, loading, e dados mockados.",
   args: {
-    mocks: z.string().describe("JSON array de mocks: [{\"url\":\"https://api.exemplo.com/users\",\"status\":200,\"body\":\"{\\\"data\\\":[]}\",\"method\":\"GET\"}]"),
-    clear: z.string().optional().describe("Se 'true', remove todos os mocks ativos em vez de adicionar"),
+    mocks: z.string().max(50000).describe("JSON array de mocks: [{\"url\":\"https://api.exemplo.com/users\",\"status\":200,\"body\":\"{\\\"data\\\":[]}\",\"method\":\"GET\"}]"),
+    clear: z.string().max(5000).optional().describe("Se 'true', remove todos os mocks ativos em vez de adicionar"),
   },
   async execute(args: { mocks: string; clear?: string }) {
     const page = await getPage();

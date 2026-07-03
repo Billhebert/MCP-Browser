@@ -1,4 +1,4 @@
-import { chromium, Browser, Page, BrowserContext, ConsoleMessage } from "playwright";
+import { chromium, Browser, Page, BrowserContext, ConsoleMessage, CDPSession } from "playwright";
 import path from "path";
 import os from "os";
 import fs from "fs";
@@ -41,6 +41,8 @@ const performanceMarks: Array<{ name: string; time: number; data?: string }> = [
 
 let lastOperation: Promise<unknown> = Promise.resolve();
 let pageLoadTimeout = 30000;
+
+const EXTENSIONS_DIR = path.join(os.homedir(), ".bvp-extensions");
 
 export async function serialized<T>(fn: () => Promise<T>): Promise<T> {
   const result = lastOperation.then(fn, fn);
@@ -154,6 +156,36 @@ async function tryRecover(): Promise<void> {
   console.error(`🔄 Navegador reiniciado automaticamente`);
 }
 
+async function loadExtensionsOnStartup(): Promise<string[]> {
+  const extPaths = (process.env.BVP_EXTENSIONS || "").split(",").map((s) => s.trim()).filter(Boolean);
+  if (extPaths.length === 0) return [];
+
+  if (!fs.existsSync(EXTENSIONS_DIR)) {
+    fs.mkdirSync(EXTENSIONS_DIR, { recursive: true });
+  }
+
+  const loaded: string[] = [];
+  for (const raw of extPaths) {
+    let resolved = raw;
+    if (!path.isAbsolute(raw)) {
+      resolved = path.resolve(EXTENSIONS_DIR, raw);
+    }
+    if (!fs.existsSync(resolved)) {
+      console.error(`⚠️ Extensão não encontrada: ${resolved}`);
+      continue;
+    }
+    // Check it has a manifest
+    const manifestPath = path.join(resolved, "manifest.json");
+    if (!fs.existsSync(manifestPath)) {
+      console.error(`⚠️ ${resolved} não contém manifest.json — ignorando`);
+      continue;
+    }
+    loaded.push(resolved);
+    console.error(`📦 Extensão agendada: ${resolved}`);
+  }
+  return loaded;
+}
+
 async function getBrowser(): Promise<Browser> {
   if (!browser || !browser.isConnected()) {
     if (browser) await tryRecover();
@@ -166,13 +198,24 @@ async function getBrowser(): Promise<Browser> {
       fs.mkdirSync(PERSISTENT_DIR, { recursive: true });
     }
 
+    const browserArgs = ["--start-maximized", "--no-sandbox"];
+
+    // Load extensions from BVP_EXTENSIONS env
+    const extDirs = await loadExtensionsOnStartup();
+    if (extDirs.length > 0) {
+      const extPaths = extDirs.join(",");
+      browserArgs.push(`--disable-extensions-except=${extPaths}`);
+      browserArgs.push(`--load-extension=${extPaths}`);
+    }
+
     browser = await chromium.launch({
       headless,
-      args: ["--start-maximized", "--no-sandbox"],
+      args: browserArgs,
     });
 
     const mode = headless ? "headless" : "visível";
-    console.error(`🌐 Navegador iniciado (${mode})`);
+    const extInfo = extDirs.length > 0 ? ` + ${extDirs.length} extensão(ões)` : "";
+    console.error(`🌐 Navegador iniciado (${mode}${extInfo})`);
   }
   return browser;
 }
@@ -220,6 +263,30 @@ export async function getPage(): Promise<Page> {
 export async function getAllPages(): Promise<Page[]> {
   const ctx = await getContext();
   return ctx.pages();
+}
+
+export async function getCDPSession(pageOrContext?: Page): Promise<CDPSession> {
+  const ctx = await getContext();
+  if (pageOrContext) {
+    return await ctx.newCDPSession(pageOrContext);
+  }
+  const p = await getPage();
+  return await ctx.newCDPSession(p);
+}
+
+export function getExtensionsDir(): string {
+  if (!fs.existsSync(EXTENSIONS_DIR)) {
+    fs.mkdirSync(EXTENSIONS_DIR, { recursive: true });
+  }
+  return EXTENSIONS_DIR;
+}
+
+export function resetBrowserState(): void {
+  consoleLogs.length = 0;
+  networkLogs.length = 0;
+  blockedPatterns.length = 0;
+  performanceMarks.length = 0;
+  console.error("🧹 Estado do navegador limpo");
 }
 
 export async function closeBrowser(): Promise<void> {

@@ -6,7 +6,7 @@ export const navigateTool: ToolDefinition = {
   name: "navigate",
   description: "Navegar para uma URL. Retorna o título e URL atual da página.",
   args: {
-    url: z.string().url().describe("URL completa para navegar (ex: https://exemplo.com)"),
+    url: z.string().max(5000).url().describe("URL completa para navegar (ex: https://exemplo.com)"),
   },
   async execute({ url }: { url: string }) {
     console.error(`🌐 Navegando para: ${url}`);

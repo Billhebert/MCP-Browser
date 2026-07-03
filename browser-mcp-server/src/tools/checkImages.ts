@@ -1,4 +1,3 @@
-import { z } from "zod";
 import type { ToolDefinition } from "../index.js";
 import { getPage, getNetworkLogs } from "../browser.js";
 

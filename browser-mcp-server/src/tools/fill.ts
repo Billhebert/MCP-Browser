@@ -6,8 +6,8 @@ export const fillTool: ToolDefinition = {
   name: "fill",
   description: "Preencher um campo de formulário com um valor.",
   args: {
-    selector: z.string().describe("Seletor CSS do campo (ex: '#email', 'input[name=\"senha\"]')"),
-    value: z.string().describe("Valor a ser preenchido"),
+    selector: z.string().max(2000).describe("Seletor CSS do campo (ex: '#email', 'input[name=\"senha\"]')"),
+    value: z.string().max(5000).describe("Valor a ser preenchido"),
   },
   async execute({ selector, value }: { selector: string; value: string }) {
     console.error(`✏️  Preenchendo campo: ${selector}`);

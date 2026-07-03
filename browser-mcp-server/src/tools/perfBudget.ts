@@ -7,7 +7,7 @@ export const perfBudgetTool: ToolDefinition = {
   description:
     "Validar métricas de performance da página atual contra um orçamento (budget). Verifica LCP, CLS, FCP, TBT, TTFB, número de requests e tamanho total. Retorna pass/fail por métrica.",
   args: {
-    budget: z.string().optional().describe("JSON com orçamento customizado. Ex: {\"lcp\":2500,\"cls\":0.1,\"fcp\":1800,\"ttfb\":600,\"requests\":50,\"totalSizeKB\":2000}. Valores em ms, exceto CLS e requests."),
+    budget: z.string().max(50000).optional().describe("JSON com orçamento customizado. Ex: {\"lcp\":2500,\"cls\":0.1,\"fcp\":1800,\"ttfb\":600,\"requests\":50,\"totalSizeKB\":2000}. Valores em ms, exceto CLS e requests."),
   },
   async execute(args: { budget?: string }) {
     const page = await getPage();

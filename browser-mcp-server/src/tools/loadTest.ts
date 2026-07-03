@@ -1,5 +1,7 @@
 import { z } from "zod";
 import type { ToolDefinition } from "../index.js";
+import { isSafeUrl } from "../corporate/ssrf.js";
+import { withRetry } from "../corporate/retry.js";
 
 const LOAD_PROFILES: Record<string, { vus: number; duration: string }> = {
   smoke: { vus: 1, duration: "10s" },
@@ -26,16 +28,16 @@ export const loadTestTool: ToolDefinition = {
   description:
     "Executar teste de carga em uma URL usando Node.js fetch (não usa o navegador). Suporta perfis smoke/load/stress/spike/soak com múltiplos VUs concorrentes. Retorna p50/p95/p99, throughput, taxa de erro.",
   args: {
-    url: z.string().describe("URL para testar"),
+    url: z.string().max(5000).describe("URL para testar"),
     profile: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe("Perfil de carga: 'smoke' (padrão), 'load', 'stress', 'spike', 'soak'"),
-    vus: z.string().optional().describe("Número de usuários virtuais simultâneos (sobrescreve o perfil)"),
-    duration: z.string().optional().describe("Duração em segundos (ex: '30s') ou usar perfil"),
-    p95Threshold: z.string().optional().describe("Threshold p95 em ms (padrão: 2000)"),
-    errorRateThreshold: z.string().optional().describe("Threshold taxa de erro (padrão: 0.05 = 5%)"),
-    rampUp: z.string().optional().describe("Tempo de ramp-up em ms (padrão: 20% da duração)"),
+    vus: z.string().max(5000).optional().describe("Número de usuários virtuais simultâneos (sobrescreve o perfil)"),
+    duration: z.string().max(100).optional().describe("Duração em segundos (ex: '30s') ou usar perfil"),
+    p95Threshold: z.string().max(5000).optional().describe("Threshold p95 em ms (padrão: 2000)"),
+    errorRateThreshold: z.string().max(5000).optional().describe("Threshold taxa de erro (padrão: 0.05 = 5%)"),
+    rampUp: z.string().max(5000).optional().describe("Tempo de ramp-up em ms (padrão: 20% da duração)"),
   },
   async execute(args: {
     url: string;
@@ -54,6 +56,11 @@ export const loadTestTool: ToolDefinition = {
     const errorRateThreshold = parseFloat(args.errorRateThreshold || "0.05");
     const rampUpMs = args.rampUp ? parseInt(args.rampUp, 10) : Math.min(durationMs * 0.2, 10000);
 
+    const urlCheck = isSafeUrl(args.url);
+    if (!urlCheck.safe) {
+      return { content: [{ type: "text", text: JSON.stringify({ error: `URL bloqueada: ${urlCheck.reason}` }, null, 2) }], isError: true };
+    }
+
     console.error(`📊 Load test: ${args.url} (${vus} VUs, ${(durationMs / 1000).toFixed(0)}s, ramp: ${(rampUpMs / 1000).toFixed(0)}s)`);
 
     const latencies: number[] = [];
@@ -70,7 +77,7 @@ export const loadTestTool: ToolDefinition = {
       while (Date.now() < endTime) {
         const reqStart = performance.now();
         try {
-          const res = await fetch(args.url);
+          const res = await withRetry(() => fetch(args.url), { maxRetries: 2, baseDelay: 500 });
           latencies.push(performance.now() - reqStart);
           if (!res.ok) errors++;
           statusCounts[String(res.status)] = (statusCounts[String(res.status)] || 0) + 1;

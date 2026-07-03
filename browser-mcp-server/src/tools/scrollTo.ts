@@ -8,7 +8,7 @@ export const scrollToTool: ToolDefinition = {
     "Rolar a página até um elemento específico ou para uma posição. Útil para carregar conteúdo lazy ou tornar um elemento visível.",
   args: {
     selector: z
-      .string()
+      .string().max(2000)
       .optional()
       .describe("Seletor CSS do elemento para rolar até ele"),
     position: z

@@ -16,7 +16,7 @@ export const getNetworkTool: ToolDefinition = {
       .optional()
       .describe("Filtrar por status HTTP (ex: 200, 404, 500)"),
     type: z
-      .string()
+      .string().max(100)
       .optional()
       .describe("Filtrar por tipo (ex: 'xhr', 'fetch', 'document', 'script', 'image')"),
     method: z
@@ -24,7 +24,7 @@ export const getNetworkTool: ToolDefinition = {
       .optional()
       .describe("Filtrar por método HTTP"),
     url: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe("Filtrar por padrão na URL"),
   },

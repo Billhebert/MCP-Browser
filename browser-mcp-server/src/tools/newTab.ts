@@ -7,7 +7,7 @@ export const newTabTool: ToolDefinition = {
   description: "Abrir uma nova aba no navegador (a aba atual continua aberta).",
   args: {
     url: z
-      .string()
+      .string().max(5000)
       .url()
       .optional()
       .describe("URL opcional para navegar na nova aba"),

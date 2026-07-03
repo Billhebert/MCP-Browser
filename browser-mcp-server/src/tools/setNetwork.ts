@@ -18,10 +18,10 @@ export const setNetworkTool: ToolDefinition = {
   description:
     "Simular condições de rede na pagina atual. Presets: slow-3g, regular-3g, fast-3g, slow-4g, regular-4g, fast-4g, offline, wifi. Ou especifique latência, download, upload customizados. NOTA: Usa CDP para throttling real.",
   args: {
-    preset: z.string().optional().describe("Preset de rede: slow-3g, regular-3g, fast-3g, slow-4g, regular-4g, fast-4g, offline, wifi"),
-    latency: z.string().optional().describe("Latência em ms (usado com download/upload se preset não especificado)"),
-    download: z.string().optional().describe("Download em kbps"),
-    upload: z.string().optional().describe("Upload em kbps"),
+    preset: z.string().max(100).optional().describe("Preset de rede: slow-3g, regular-3g, fast-3g, slow-4g, regular-4g, fast-4g, offline, wifi"),
+    latency: z.string().max(100).optional().describe("Latência em ms (usado com download/upload se preset não especificado)"),
+    download: z.string().max(100).optional().describe("Download em kbps"),
+    upload: z.string().max(100).optional().describe("Upload em kbps"),
   },
   async execute(args: { preset?: string; latency?: string; download?: string; upload?: string }) {
     const page = await getPage();

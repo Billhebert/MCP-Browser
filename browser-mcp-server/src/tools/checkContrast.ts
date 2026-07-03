@@ -42,7 +42,7 @@ export const checkContrastTool: ToolDefinition = {
   description:
     "Auditar contraste de cores na página atual. Verifica texto vs fundo contra WCAG AA (4.5:1 normal, 3:1 large) e AAA (7:1 normal, 4.5:1 large). Retorna score 0-100 com issues detalhadas.",
   args: {
-    level: z.string().optional().describe("Nível WCAG: 'aa' (padrão) ou 'aaa'"),
+    level: z.string().max(100).optional().describe("Nível WCAG: 'aa' (padrão) ou 'aaa'"),
   },
   async execute(args: { level?: string }) {
     const page = await getPage();

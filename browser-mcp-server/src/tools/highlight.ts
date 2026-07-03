@@ -7,9 +7,9 @@ export const highlightTool: ToolDefinition = {
   description:
     "Destacar visualmente um elemento na página do navegador com uma borda colorida e pulsante. Útil para você ver exatamente qual elemento será clicado/preenchido.",
   args: {
-    selector: z.string().describe("Seletor CSS do elemento a destacar"),
+    selector: z.string().max(2000).describe("Seletor CSS do elemento a destacar"),
     color: z
-      .string()
+      .string().max(100)
       .optional()
       .describe("Cor da borda (ex: 'red', '#ff0000', 'blue'). Padrão: 'red'"),
   },

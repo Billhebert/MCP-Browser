@@ -25,12 +25,12 @@ ENV NODE_ENV=production
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --omit=dev && npx playwright install chromium 2>/dev/null || true
+RUN npm ci && npx playwright install chromium 2>/dev/null || true
 
 COPY tsconfig.json ./
 COPY src/ ./src/
 
-RUN npx tsc --noEmit 2>/dev/null || true
+RUN npx tsc
 
 EXPOSE 3100
 
@@ -40,4 +40,4 @@ ENV HOME=/home/bvp-user
 RUN useradd -m bvp-user && chown -R bvp-user:bvp-user /app /data /home/bvp-user
 USER bvp-user
 
-ENTRYPOINT ["npx", "tsx", "src/index.ts"]
+ENTRYPOINT ["node", "dist/index.js"]

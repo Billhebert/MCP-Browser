@@ -1,4 +1,3 @@
-import { z } from "zod";
 import type { ToolDefinition } from "../index.js";
 import { getPage } from "../browser.js";
 import { getAuditStats } from "../corporate/auditTrail.js";

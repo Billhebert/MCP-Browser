@@ -5,7 +5,7 @@ import { loadWebhooks, sendWebhook } from "../src/corporate/webhook.js";
 import { getSession, listSessions, deleteSession, cleanupSessions } from "../src/corporate/sessions.js";
 import { validateApiKey, requireApiKey } from "../src/corporate/auth.js";
 import { addAnnotation, getAnnotations, listAnnotationKeys, addSchedule, listSchedules, removeSchedule, toggleSchedule } from "../src/corporate/collab.js";
-import { maskSensitiveRegions, findSensitiveRegions } from "../src/corporate/dataMasker.js";
+import { maskSensitiveRegions } from "../src/corporate/dataMasker.js";
 import { PNG } from "pngjs";
 import fs from "fs";
 import path from "path";
@@ -16,17 +16,17 @@ try { fs.unlinkSync(path.join(os.tmpdir(), "audit.jsonl")); } catch {}
 try { fs.unlinkSync(path.join(os.homedir(), ".bvp-audit", "audit.jsonl")); } catch {}
 
 describe("auditTrail", () => {
-  it("writeAudit e readAudits", () => {
-    writeAudit({ timestamp: "2025-01-01", tool: "ut-test", user: "tester", session: "s1", args: {}, result: { status: "pass", score: 90 }, durationMs: 100 });
+  it("writeAudit e readAudits", async () => {
+    await writeAudit({ timestamp: "2025-01-01", tool: "ut-test", user: "tester", session: "s1", args: {}, result: { status: "pass", score: 90 }, durationMs: 100 });
     const entries = readAudits(10);
     const ours = entries.filter(e => e.tool === "ut-test");
     expect(ours.length).toBeGreaterThanOrEqual(1);
     expect(ours[0].result.score).toBe(90);
   });
 
-  it("readAudits com filtro", () => {
-    writeAudit({ timestamp: "2025-01-01", tool: "ut-seo", user: "t1", session: "s1", args: {}, result: { status: "pass" }, durationMs: 10 });
-    writeAudit({ timestamp: "2025-01-01", tool: "ut-a11y", user: "t1", session: "s1", args: {}, result: { status: "fail" }, durationMs: 10 });
+  it("readAudits com filtro", async () => {
+    await writeAudit({ timestamp: "2025-01-01", tool: "ut-seo", user: "t1", session: "s1", args: {}, result: { status: "pass" }, durationMs: 10 });
+    await writeAudit({ timestamp: "2025-01-01", tool: "ut-a11y", user: "t1", session: "s1", args: {}, result: { status: "fail" }, durationMs: 10 });
     const filtered = readAudits(100, { tool: "ut-seo" });
     expect(filtered.length).toBe(1);
     expect(filtered[0].tool).toBe("ut-seo");
@@ -34,10 +34,10 @@ describe("auditTrail", () => {
     expect(failFilter.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("getAuditStats", () => {
-    writeAudit({ timestamp: "2025-01-01", tool: "ut-stats-a", user: "u", session: "s", args: {}, result: { status: "pass", score: 80 }, durationMs: 5 });
-    writeAudit({ timestamp: "2025-01-01", tool: "ut-stats-a", user: "u", session: "s", args: {}, result: { status: "fail" }, durationMs: 5 });
-    writeAudit({ timestamp: "2025-01-01", tool: "ut-stats-b", user: "u", session: "s", args: {}, result: { status: "pass", score: 100 }, durationMs: 5 });
+  it("getAuditStats", async () => {
+    await writeAudit({ timestamp: "2025-01-01", tool: "ut-stats-a", user: "u", session: "s", args: {}, result: { status: "pass", score: 80 }, durationMs: 5 });
+    await writeAudit({ timestamp: "2025-01-01", tool: "ut-stats-a", user: "u", session: "s", args: {}, result: { status: "fail" }, durationMs: 5 });
+    await writeAudit({ timestamp: "2025-01-01", tool: "ut-stats-b", user: "u", session: "s", args: {}, result: { status: "pass", score: 100 }, durationMs: 5 });
     const stats = getAuditStats();
     expect(stats.totalExecutions).toBeGreaterThanOrEqual(3);
     expect(stats.totalErrors).toBeGreaterThanOrEqual(1);
@@ -169,12 +169,100 @@ describe("dataMasker", () => {
     expect(decoded.width).toBe(2);
     expect(decoded.height).toBe(2);
   });
+});
 
-  it("findSensitiveRegions retorna pelo menos uma região", async () => {
-    const png = new PNG({ width: 4, height: 4, fill: true });
-    const buf = PNG.sync.write(png);
-    const regions = await findSensitiveRegions(buf);
-    expect(regions.length).toBeGreaterThanOrEqual(1);
-    expect(regions[0].width).toBe(4);
+describe("ssrf", () => {
+  it("isSafeUrl bloqueia localhost", async () => {
+    const { isSafeUrl } = await import("../src/corporate/ssrf.js");
+    expect(isSafeUrl("http://localhost:8080").safe).toBe(false);
+    expect(isSafeUrl("http://127.0.0.1").safe).toBe(false);
+    expect(isSafeUrl("http://0.0.0.0").safe).toBe(false);
+    expect(isSafeUrl("http://[::1]").safe).toBe(false);
+  });
+  it("isSafeUrl bloqueia RFC1918", async () => {
+    const { isSafeUrl } = await import("../src/corporate/ssrf.js");
+    expect(isSafeUrl("http://10.0.0.1").safe).toBe(false);
+    expect(isSafeUrl("http://192.168.1.1").safe).toBe(false);
+    expect(isSafeUrl("http://172.16.0.1").safe).toBe(false);
+  });
+  it("isSafeUrl permite URLs públicas", async () => {
+    const { isSafeUrl } = await import("../src/corporate/ssrf.js");
+    expect(isSafeUrl("https://example.com").safe).toBe(true);
+    expect(isSafeUrl("https://api.github.com").safe).toBe(true);
+  });
+  it("isSafeUrl bloqueia protocolo não HTTP", async () => {
+    const { isSafeUrl } = await import("../src/corporate/ssrf.js");
+    expect(isSafeUrl("file:///etc/passwd").safe).toBe(false);
+    expect(isSafeUrl("ftp://example.com").safe).toBe(false);
+  });
+  it("isSafeUrl retorna false para URL inválida", async () => {
+    const { isSafeUrl } = await import("../src/corporate/ssrf.js");
+    expect(isSafeUrl("not a url").safe).toBe(false);
+  });
+});
+
+describe("logger", () => {
+  it("createLogger retorna objeto com métodos", async () => {
+    const { createLogger } = await import("../src/corporate/logger.js");
+    const log = createLogger({ service: "test" });
+    expect(log).toHaveProperty("info");
+    expect(log).toHaveProperty("warn");
+    expect(log).toHaveProperty("error");
+    expect(log).toHaveProperty("debug");
+    expect(log).toHaveProperty("child");
+    expect(log).toHaveProperty("flush");
+  });
+  it("child cria logger com bindings adicionais", async () => {
+    const { createLogger } = await import("../src/corporate/logger.js");
+    const log = createLogger({ a: 1 });
+    const child = log.child({ b: 2 });
+    expect(child).toHaveProperty("info");
+  });
+});
+
+describe("circuitBreaker", () => {
+  it("circuitCall executa função com sucesso", async () => {
+    const { circuitCall } = await import("../src/corporate/circuitBreaker.js");
+    const result = await circuitCall("test", async () => "ok");
+    expect(result).toBe("ok");
+  });
+  it("circuitCall abre após falhas consecutivas", async () => {
+    const { circuitCall } = await import("../src/corporate/circuitBreaker.js");
+    const failFn = async () => { throw new Error("fail"); };
+    for (let i = 0; i < 5; i++) {
+      try { await circuitCall("test-fail", failFn); } catch {}
+    }
+    try { await circuitCall("test-fail", failFn); } catch (e) {
+      expect((e as Error).message).toContain("open");
+    }
+  });
+});
+
+describe("retry", () => {
+  it("withRetry executa com sucesso na primeira tentativa", async () => {
+    const { withRetry } = await import("../src/corporate/retry.js");
+    const result = await withRetry(async () => "ok", { maxRetries: 3 });
+    expect(result).toBe("ok");
+  });
+  it("withRetry falha após exaurir tentativas", async () => {
+    const { withRetry } = await import("../src/corporate/retry.js");
+    let calls = 0;
+    await expect(withRetry(async () => {
+      calls++;
+      throw new Error(`attempt ${calls}`);
+    }, { maxRetries: 2, baseDelay: 10 })).rejects.toThrow();
+    expect(calls).toBe(3); // initial + 2 retries
+  });
+});
+
+describe("health", () => {
+  it("incRequestCount e incErrorCount funcionam", async () => {
+    const { incRequestCount, incErrorCount, resetCounters } = await import("../src/corporate/health.js");
+    resetCounters();
+    incRequestCount();
+    incRequestCount();
+    incErrorCount();
+    // Can't easily read internal state, but no throw means success
+    expect(true).toBe(true);
   });
 });

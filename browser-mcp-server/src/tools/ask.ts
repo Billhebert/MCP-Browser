@@ -7,9 +7,9 @@ export const askTool: ToolDefinition = {
   description:
     "EXIBE UMA MENSAGEM PARA O USUÁRIO E AGUARDA RESPOSTA. Use esta tool para perguntar qualquer coisa ao usuário antes de prosseguir. É OBRIGATÓRIO usar depois de cada navegação e antes de cada ação destrutiva.",
   args: {
-    question: z.string().describe("Pergunta clara sobre o que precisa saber ou confirmar"),
+    question: z.string().max(5000).describe("Pergunta clara sobre o que precisa saber ou confirmar"),
     context: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe("Contexto opcional: URL atual, título, resumo do que encontrou na página"),
   },

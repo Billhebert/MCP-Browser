@@ -6,7 +6,7 @@ export const hoverTool: ToolDefinition = {
   name: "hover",
   description: "Passar o mouse sobre um elemento (útil para menus dropdown que aparecem no hover).",
   args: {
-    selector: z.string().describe("Seletor CSS do elemento para passar o mouse"),
+    selector: z.string().max(2000).describe("Seletor CSS do elemento para passar o mouse"),
   },
   async execute({ selector }: { selector: string }) {
     const page = await getPage();

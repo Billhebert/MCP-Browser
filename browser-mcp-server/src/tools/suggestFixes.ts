@@ -47,7 +47,7 @@ export const suggestFixesTool: ToolDefinition = {
   description:
     "Analisar o JSON de resultado de qualquer ferramenta de auditoria e sugerir correções específicas para cada issue encontrada. Recebe o output JSON de qualquer tool (analyze_seo, check_contrast, etc.) e retorna sugestões acionáveis.",
   args: {
-    data: z.string().describe("JSON string com o resultado de uma ferramenta de auditoria (analyze_seo, check_contrast, etc.)"),
+    data: z.string().max(50000).describe("JSON string com o resultado de uma ferramenta de auditoria (analyze_seo, check_contrast, etc.)"),
   },
   async execute(args: { data: string }) {
     const data = JSON.parse(args.data) as Record<string, unknown>;

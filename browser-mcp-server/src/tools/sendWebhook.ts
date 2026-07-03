@@ -7,8 +7,8 @@ export const sendWebhookTool: ToolDefinition = {
   description:
     "Enviar notificação via webhook corporativo. Configurar webhooks via env var BVP_WEBHOOKS como JSON array: [{\"url\":\"https://hooks.slack.com/...\",\"events\":[\"audit_complete\",\"*\"],\"headers\":{\"Authorization\":\"Bearer ...\"}}]. Events comuns: audit_complete, error, schedule_tick.",
   args: {
-    event: z.string().describe("Nome do evento: 'audit_complete', 'error', 'custom'"),
-    payload: z.string().describe("JSON string com payload a enviar"),
+    event: z.string().max(100).describe("Nome do evento: 'audit_complete', 'error', 'custom'"),
+    payload: z.string().max(50000).describe("JSON string com payload a enviar"),
   },
   async execute(args: { event: string; payload: string }) {
     loadWebhooks();

@@ -8,7 +8,7 @@ export const getHtmlTool: ToolDefinition = {
     "Extrair o HTML da página toda ou de um elemento específico. Retorna até 10000 caracteres.",
   args: {
     selector: z
-      .string()
+      .string().max(2000)
       .optional()
       .describe("Seletor CSS opcional. Se omitido, extrai o HTML da página inteira."),
   },

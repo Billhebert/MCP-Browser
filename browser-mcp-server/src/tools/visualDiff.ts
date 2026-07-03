@@ -10,8 +10,8 @@ export const visualDiffTool: ToolDefinition = {
   description:
     "Comparar screenshot atual da página com um snapshot salvo anteriormente (via save_snapshot). Gera diff visual usando pixelmatch, retorna % de diferença e imagem diff em base64. Útil para detectar mudanças visuais após ações.",
   args: {
-    snapshotName: z.string().describe("Nome do snapshot salvo anteriormente para comparar"),
-    threshold: z.string().optional().describe("Threshold de diferença (0.0-1.0, padrão: 0.02 = 2%)"),
+    snapshotName: z.string().max(5000).describe("Nome do snapshot salvo anteriormente para comparar"),
+    threshold: z.string().max(5000).optional().describe("Threshold de diferença (0.0-1.0, padrão: 0.02 = 2%)"),
   },
   async execute(args: { snapshotName: string; threshold?: string }) {
     const page = await getPage();

@@ -19,7 +19,7 @@ export function validateApiKey(key: string | undefined): { valid: boolean; user:
 
 export function requireApiKey(): void {
   if (API_KEY) {
-    console.error(`🔑 Auth required: BVP_API_KEY configured (${API_KEY.slice(0, 4)}...${API_KEY.slice(-4)})`);
+    console.error(`🔑 Auth required: API key configured`);
   } else {
     console.error(`🔓 Auth disabled: no BVP_API_KEY set`);
   }

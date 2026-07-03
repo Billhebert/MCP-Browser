@@ -8,27 +8,27 @@ export const findTool: ToolDefinition = {
     "Buscar elementos na página por texto, role, placeholder, label ou CSS. Retorna uma lista de seletores CSS que você pode usar em click/fill/get_text.",
   args: {
     text: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe("Texto visível do elemento (ex: 'Kanban', 'Enviar')"),
     role: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe("Role ARIA (ex: 'button', 'link', 'textbox', 'heading')"),
     placeholder: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe("Placeholder do input (ex: 'Buscar...', 'Email')"),
     label: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe("Label associado ao campo (ex: 'Nome', 'Senha')"),
     tag: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe("Tag HTML (ex: 'button', 'a', 'input', 'select')"),
     css: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe("Seletor CSS direto para verificar se existe"),
   },

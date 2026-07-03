@@ -7,7 +7,7 @@ export const elementScreenshotTool: ToolDefinition = {
   description:
     "Capturar screenshot de UM elemento específico da página (não a página toda). Útil para ver detalhes de um botão, modal, campo, etc.",
   args: {
-    selector: z.string().describe("Seletor CSS do elemento para capturar"),
+    selector: z.string().max(2000).describe("Seletor CSS do elemento para capturar"),
   },
   async execute({ selector }: { selector: string }) {
     const page = await getPage();

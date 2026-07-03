@@ -6,12 +6,12 @@ export const createJiraIssueTool: ToolDefinition = {
   description:
     "Criar ticket no Jira a partir de resultado de auditoria. Requer JIRA_HOST, JIRA_EMAIL, JIRA_TOKEN variáveis de ambiente. Cria issue com título, descrição, prioridade e labels baseados no resultado da auditoria.",
   args: {
-    project: z.string().describe("Chave do projeto Jira (ex: 'PROJ', 'QA')"),
-    summary: z.string().describe("Título resumido do issue (ex: 'Auditoria SEO - missing meta description')"),
-    description: z.string().describe("Descrição detalhada do issue"),
-    priority: z.string().optional().describe("Prioridade: 'Highest', 'High', 'Medium', 'Low' (padrão: 'Medium')"),
-    labels: z.string().optional().describe("JSON array de labels (ex: '[\"auditoria\",\"seo\"]')"),
-    issueType: z.string().optional().describe("Tipo: 'Bug', 'Task', 'Improvement' (padrão: 'Bug')"),
+    project: z.string().max(500).describe("Chave do projeto Jira (ex: 'PROJ', 'QA')"),
+    summary: z.string().max(5000).describe("Título resumido do issue (ex: 'Auditoria SEO - missing meta description')"),
+    description: z.string().max(5000).describe("Descrição detalhada do issue"),
+    priority: z.string().max(100).optional().describe("Prioridade: 'Highest', 'High', 'Medium', 'Low' (padrão: 'Medium')"),
+    labels: z.string().max(50000).optional().describe("JSON array de labels (ex: '[\"auditoria\",\"seo\"]')"),
+    issueType: z.string().max(100).optional().describe("Tipo: 'Bug', 'Task', 'Improvement' (padrão: 'Bug')"),
   },
   async execute(args: { project: string; summary: string; description: string; priority?: string; labels?: string; issueType?: string }) {
     const host = process.env.JIRA_HOST;

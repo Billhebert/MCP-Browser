@@ -73,7 +73,7 @@ export const checkSpellingTool: ToolDefinition = {
   description:
     "Verificar ortografia básica no texto visível da página. Detecta palavras potencialmente incorretas usando um dicionário embutido de ~1000 palavras em inglês e português. AVISO: Verificação simplificada — palavras técnicas, nomes próprios e neologismos podem gerar falsos positivos.",
   args: {
-    language: z.string().optional().describe("Idioma: 'en' (inglês, padrão), 'pt' (português), 'both'"),
+    language: z.string().max(100).optional().describe("Idioma: 'en' (inglês, padrão), 'pt' (português), 'both'"),
   },
   async execute(args: { language?: string }) {
     const page = await getPage();

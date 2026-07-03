@@ -1,4 +1,3 @@
-import { z } from "zod";
 import type { ToolDefinition } from "../index.js";
 import { getPage } from "../browser.js";
 
@@ -13,7 +12,7 @@ export const checkCookiesConsentTool: ToolDefinition = {
     const issues: Array<{ type: string; severity: string; message: string; details?: string }> = [];
 
     const result = await page.evaluate(() => {
-      const bodyText = document.body.innerText.toLowerCase();
+      const bodyText = document.body.textContent.toLowerCase();
       const html = document.documentElement.innerHTML.toLowerCase();
 
       const keywords = ["cookies", "lgpd", "gdpr", "privacidade", "privacy", "consentimento", "consent",

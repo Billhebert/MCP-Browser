@@ -1,4 +1,3 @@
-import { z } from "zod";
 import type { ToolDefinition } from "../index.js";
 import { getPage } from "../browser.js";
 
@@ -13,7 +12,7 @@ export const checkReadabilityTool: ToolDefinition = {
     const issues: Array<{ type: string; severity: string; message: string; details?: string }> = [];
 
     const metrics = await page.evaluate(() => {
-      const text = document.body.innerText;
+      const text = document.body.textContent;
       const words = text.split(/\s+/).filter(Boolean);
       const sentences = text.split(/[.!?]+/).filter(Boolean);
       const paragraphs = Array.from(document.querySelectorAll("p")).map((p) => p.textContent || "").filter(Boolean);

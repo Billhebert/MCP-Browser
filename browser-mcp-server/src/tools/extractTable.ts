@@ -7,8 +7,8 @@ export const extractTableTool: ToolDefinition = {
   description:
     "Extrair tabelas HTML da página atual como dados estruturados (JSON). Detecta todas as tabelas (<table>, <table role='grid'>), extrai cabeçalhos e linhas, e retorna em formato array de objetos. Útil para scraping de dados tabulares.",
   args: {
-    selector: z.string().optional().describe("Seletor CSS da tabela específica (padrão: todas as tabelas)"),
-    format: z.string().optional().describe("Formato: 'json' (padrão), 'csv' (string CSV)"),
+    selector: z.string().max(2000).optional().describe("Seletor CSS da tabela específica (padrão: todas as tabelas)"),
+    format: z.string().max(100).optional().describe("Formato: 'json' (padrão), 'csv' (string CSV)"),
   },
   async execute(args: { selector?: string; format?: string }) {
     const page = await getPage();

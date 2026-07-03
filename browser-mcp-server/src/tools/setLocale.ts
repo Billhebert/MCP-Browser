@@ -7,7 +7,7 @@ export const setLocaleTool: ToolDefinition = {
   description:
     "Alterar o idioma/localidade do navegador. Afeta Accept-Language e navigator.language. Ex: 'pt-BR', 'en-US', 'es', 'fr-FR'.",
   args: {
-    locale: z.string().describe("Código do locale (ex: 'pt-BR', 'en-US', 'es', 'fr-FR')"),
+    locale: z.string().max(100).describe("Código do locale (ex: 'pt-BR', 'en-US', 'es', 'fr-FR')"),
   },
   async execute({ locale }: { locale: string }) {
     console.error(`🌍 Alterando locale para: ${locale}`);

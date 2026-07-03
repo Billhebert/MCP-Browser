@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { ToolDefinition } from "../index.js";
+import { isSafeUrl } from "../corporate/ssrf.js";
 
 function validateSchema(body: any, schema: Record<string, string>): string[] {
   const errors: string[] = [];
@@ -22,27 +23,27 @@ export const testApiTool: ToolDefinition = {
   description:
     "Testar um endpoint de API via HTTP. Faz requisição com método/configuração especificados, valida status code, tempo de resposta, e schema JSON. Não usa o navegador — chamada direta via Node. Útil para testar APIs do sistema que o browser está acessando.",
   args: {
-    url: z.string().describe("URL do endpoint para testar"),
+    url: z.string().max(5000).describe("URL do endpoint para testar"),
     method: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe("Método HTTP: GET, POST, PUT, DELETE, PATCH (padrão: GET)"),
     expectedStatus: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe("Status code esperado (ex: 200, 201, 204)"),
     expectedSchema: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe(
         "Schema JSON esperado como string JSON (ex: '{\"id\":\"string\",\"name\":\"string\"}')",
       ),
     headers: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe("Headers customizados como string JSON (ex: '{\"Authorization\":\"Bearer xyz\"}')"),
-    body: z.string().optional().describe("Body da requisição (string)"),
-    maxTime: z.string().optional().describe("Tempo máximo em ms (padrão: 30000)"),
+    body: z.string().max(50000).optional().describe("Body da requisição (string)"),
+    maxTime: z.string().max(5000).optional().describe("Tempo máximo em ms (padrão: 30000)"),
   },
   async execute(args: {
     url: string;
@@ -64,6 +65,11 @@ export const testApiTool: ToolDefinition = {
     console.error(`🧪 API test: ${method} ${args.url}`);
 
     try {
+      const urlCheck = isSafeUrl(args.url);
+      if (!urlCheck.safe) {
+        return { content: [{ type: "text", text: JSON.stringify({ error: urlCheck.reason }, null, 2) }], isError: true };
+      }
+
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), maxTime);
       const resp = await fetch(args.url, {

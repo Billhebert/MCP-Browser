@@ -15,10 +15,15 @@ export function loadWebhooks(): void {
 export function sendWebhook(event: string, payload: Record<string, unknown>): void {
   const targets = WEBHOOKS.filter((w) => w.events.includes("*") || w.events.includes(event));
   for (const t of targets) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
     fetch(t.url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ event, ...payload, timestamp: new Date().toISOString() }),
-    }).catch((e) => console.error(`[Webhook] Failed ${t.url}: ${(e as Error).message}`));
+      signal: controller.signal,
+    })
+      .catch((e) => console.error(`[Webhook] Failed ${t.url}: ${(e as Error).message}`))
+      .finally(() => clearTimeout(timeout));
   }
 }

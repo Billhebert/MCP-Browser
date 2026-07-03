@@ -1,13 +1,9 @@
-// Lazy import for pixelmatch/pngjs — only loaded when data masking is used
-let pixelmatch: ((img1: Buffer, img2: Buffer, output: Buffer, w: number, h: number, opts: any) => number) | null = null;
 let PNG: any = null;
 
 async function loadDeps(): Promise<void> {
   if (PNG) return;
   const png = await import("pngjs");
-  const pm = await import("pixelmatch");
   PNG = png.PNG;
-  pixelmatch = pm.default;
 }
 
 function rgbToGray(r: number, g: number, b: number): number {
@@ -37,16 +33,4 @@ export async function maskSensitiveRegions(
     }
   }
   return PNG.sync.write(img);
-}
-
-export async function findSensitiveRegions(screenshotBuffer: Buffer): Promise<Array<{ x: number; y: number; width: number; height: number }>> {
-  await loadDeps();
-  const regions: Array<{ x: number; y: number; width: number; height: number }> = [];
-  const img = PNG.sync.read(screenshotBuffer);
-  // Detect regions where the page has input fields by looking for rectangular patterns
-  // This is a simplified approach — real masking would use DOM coordinates
-  // For now, mark the bottom 15% of the screen as potentially sensitive (forms area)
-  const h = Math.floor(img.height * 0.15);
-  regions.push({ x: 0, y: img.height - h, width: img.width, height: h });
-  return regions;
 }

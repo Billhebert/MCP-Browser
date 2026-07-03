@@ -7,11 +7,11 @@ export const getCookiesTool: ToolDefinition = {
   description: "Obter todos os cookies da página atual. Útil para verificar sessão e autenticação.",
   args: {
     name: z
-      .string()
+      .string().max(500)
       .optional()
       .describe("Filtrar por nome do cookie"),
     domain: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe("Filtrar por domínio"),
   },

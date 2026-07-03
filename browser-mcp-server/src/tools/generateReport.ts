@@ -10,9 +10,9 @@ export const generateReportTool: ToolDefinition = {
   description:
     "Gerar relatório HTML/JUnit/CSV/JSON a partir de dados fornecidos. Útil para documentar resultados de análises (SEO, a11y, security, etc.) em formato padronizado.",
   args: {
-    data: z.string().describe("Dados em JSON string com os resultados das análises"),
-    format: z.string().optional().describe("Formato: 'html' (padrão), 'junit', 'csv', 'json'"),
-    title: z.string().optional().describe("Título do relatório (padrão: 'QA Report')"),
+    data: z.string().max(50000).describe("Dados em JSON string com os resultados das análises"),
+    format: z.string().max(100).optional().describe("Formato: 'html' (padrão), 'junit', 'csv', 'json'"),
+    title: z.string().max(500).optional().describe("Título do relatório (padrão: 'QA Report')"),
   },
   async execute(args: { data: string; format?: string; title?: string }) {
     const rawData = JSON.parse(args.data);

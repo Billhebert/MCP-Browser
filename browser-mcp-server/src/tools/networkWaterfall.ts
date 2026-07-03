@@ -18,8 +18,8 @@ export const networkWaterfallTool: ToolDefinition = {
   description:
     "Analisar requisições de rede capturadas na página atual. Gera waterfall, análise de domínios terceiros, compressão, cache, render-blocking resources. Útil para diagnosticar performance.",
   args: {
-    slowThreshold: z.string().optional().describe("Threshold TTFB em ms para considerar lento (padrão: 1000)"),
-    clear: z.string().optional().describe("Se 'true', limpa o log de rede após análise"),
+    slowThreshold: z.string().max(100).optional().describe("Threshold TTFB em ms para considerar lento (padrão: 1000)"),
+    clear: z.string().max(5000).optional().describe("Se 'true', limpa o log de rede após análise"),
   },
   async execute(args: { slowThreshold?: string; clear?: string }) {
     const page = await getPage();

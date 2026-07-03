@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { ToolDefinition } from "../index.js";
+import { isSafeUrl } from "../corporate/ssrf.js";
 
 async function sendSlack(webhookUrl: string, message: string, blocks?: Array<Record<string, unknown>>): Promise<boolean> {
   const body: Record<string, unknown> = { text: message };
@@ -17,12 +18,16 @@ export const notifySlackTool: ToolDefinition = {
   description:
     "Enviar notificação para Slack via webhook. Requer URL de webhook do Slack (criar em api.slack.com/apps → Incoming Webhooks). Suporte a mensagens simples e blocks formatados.",
   args: {
-    webhookUrl: z.string().describe("URL do webhook do Slack (ex: https://hooks.slack.com/services/...)"),
-    message: z.string().describe("Mensagem a enviar (formatação Markdown suportada)"),
-    title: z.string().optional().describe("Título opcional para o attachment"),
-    color: z.string().optional().describe("Cor da barra lateral: 'good' (verde), 'warning' (amarelo), 'danger' (vermelho)"),
+    webhookUrl: z.string().max(5000).describe("URL do webhook do Slack (ex: https://hooks.slack.com/services/...)"),
+    message: z.string().max(5000).describe("Mensagem a enviar (formatação Markdown suportada)"),
+    title: z.string().max(500).optional().describe("Título opcional para o attachment"),
+    color: z.string().max(100).optional().describe("Cor da barra lateral: 'good' (verde), 'warning' (amarelo), 'danger' (vermelho)"),
   },
   async execute(args: { webhookUrl: string; message: string; title?: string; color?: string }) {
+    const urlCheck = isSafeUrl(args.webhookUrl);
+    if (!urlCheck.safe) {
+      return { content: [{ type: "text", text: JSON.stringify({ error: `Webhook URL bloqueada: ${urlCheck.reason}` }, null, 2) }], isError: true };
+    }
     const blocks: Array<Record<string, unknown>> = [
       {
         type: "section",

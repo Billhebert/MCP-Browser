@@ -10,10 +10,10 @@ export const setCookiesTool: ToolDefinition = {
     cookies: z
       .array(
         z.object({
-          name: z.string().describe("Nome do cookie"),
-          value: z.string().describe("Valor do cookie"),
-          domain: z.string().optional().describe("Domínio (ex: '.exemplo.com')"),
-          path: z.string().optional().describe("Path (padrão: '/')"),
+          name: z.string().max(500).describe("Nome do cookie"),
+          value: z.string().max(5000).describe("Valor do cookie"),
+          domain: z.string().max(5000).optional().describe("Domínio (ex: '.exemplo.com')"),
+          path: z.string().max(5000).optional().describe("Path (padrão: '/')"),
           httpOnly: z.boolean().optional(),
           secure: z.boolean().optional(),
         }),

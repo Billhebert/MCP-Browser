@@ -1,6 +1,6 @@
-import { z } from "zod";
 import type { ToolDefinition } from "../index.js";
 import { getPage, getNetworkLogs } from "../browser.js";
+import { isSafeUrl } from "../corporate/ssrf.js";
 
 export const checkSslTool: ToolDefinition = {
   name: "check_ssl",
@@ -42,6 +42,11 @@ export const checkSslTool: ToolDefinition = {
 
     let certDetails: Record<string, unknown> = {};
     try {
+      const urlCheck = isSafeUrl(`https://${hostname}`);
+      if (!urlCheck.safe) {
+        issues.push({ type: "ssl", severity: "high", message: urlCheck.reason || "Unknown SSRF check failure" });
+      }
+
       const resp = await fetch(`https://${hostname}`, { method: "HEAD" });
       certDetails = {
         status: resp.status,

@@ -24,8 +24,8 @@ export const compareAuditsTool: ToolDefinition = {
   description:
     "Comparar dois resultados de auditoria (before/after). Mostra evolução de score, issues novos, issues resolvidos, e pioras. Útil para validar correções em PRs, deploys, e sprints.",
   args: {
-    before: z.string().describe("JSON string com resultado da auditoria anterior (baseline)"),
-    after: z.string().describe("JSON string com resultado da auditoria atual"),
+    before: z.string().max(50000).describe("JSON string com resultado da auditoria anterior (baseline)"),
+    after: z.string().max(50000).describe("JSON string com resultado da auditoria atual"),
   },
   async execute(args: { before: string; after: string }) {
     const before: AuditData = JSON.parse(args.before);

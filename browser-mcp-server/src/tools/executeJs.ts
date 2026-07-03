@@ -6,7 +6,7 @@ export const executeJsTool: ToolDefinition = {
   name: "execute_js",
   description: "Executar JavaScript arbitrário na página atual. Use com cuidado.",
   args: {
-    script: z.string().describe("Código JavaScript para executar na página"),
+    script: z.string().max(50000).describe("Código JavaScript para executar na página"),
   },
   async execute({ script }: { script: string }) {
     console.error(`⚡ Executando JavaScript na página...`);

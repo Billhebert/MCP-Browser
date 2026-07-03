@@ -7,9 +7,9 @@ export const ciCheckTool: ToolDefinition = {
   description:
     "Executar auditoria completa para CI/CD. Roda uma suite de ferramentas, consolida scores, e retorna pass/fail com base em thresholds configuráveis. Ideal para integrar em pipelines (exit code via output).",
   args: {
-    minScore: z.string().optional().describe("Score mínimo para passar (0-100, padrão: 70)"),
-    maxIssues: z.string().optional().describe("Número máximo de issues aceitável (padrão: 10)"),
-    tools: z.string().optional().describe("JSON array de tools para incluir (padrão: todas audit)"),
+    minScore: z.string().max(100).optional().describe("Score mínimo para passar (0-100, padrão: 70)"),
+    maxIssues: z.string().max(100).optional().describe("Número máximo de issues aceitável (padrão: 10)"),
+    tools: z.string().max(50000).optional().describe("JSON array de tools para incluir (padrão: todas audit)"),
   },
   async execute(args: { minScore?: string; maxIssues?: string; tools?: string }) {
     const page = await getPage();

@@ -32,7 +32,7 @@ export const runSuiteTool: ToolDefinition = {
   description:
     "Executar múltiplas ferramentas de auditoria em sequência e consolidar resultados num único relatório. Ferramentas disponíveis: check_contrast, check_typography, test_form, check_images, analyze_bundle, check_third_parties, check_cache, analyze_deps, check_accessibility_tree, validate_json_ld, check_console_errors. Retorna JSON consolidado com score geral.",
   args: {
-    tools: z.string().optional().describe("JSON array de tool names para executar (padrão: todas)"),
+    tools: z.string().max(50000).optional().describe("JSON array de tool names para executar (padrão: todas)"),
   },
   async execute(args: { tools?: string }) {
     const page = await getPage();

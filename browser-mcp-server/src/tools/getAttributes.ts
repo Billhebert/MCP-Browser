@@ -7,7 +7,7 @@ export const getAttributesTool: ToolDefinition = {
   description:
     "Obter todos os atributos de um elemento (id, class, aria-label, role, href, src, etc). Útil para descobrir seletores precisos.",
   args: {
-    selector: z.string().describe("Seletor CSS do elemento"),
+    selector: z.string().max(2000).describe("Seletor CSS do elemento"),
   },
   async execute({ selector }: { selector: string }) {
     const page = await getPage();
@@ -29,7 +29,7 @@ export const getAttributesTool: ToolDefinition = {
         attrs[attr.name] = attr.value;
       }
       attrs["tagName"] = (el as HTMLElement).tagName?.toLowerCase() || "";
-      attrs["innerText"] = ((el as HTMLElement).innerText || "").trim().slice(0, 200);
+      attrs["innerText"] = ((el as HTMLElement).textContent || "").trim().slice(0, 200);
       return attrs;
     });
 

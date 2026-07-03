@@ -7,7 +7,7 @@ export const testFormTool: ToolDefinition = {
   description:
     "Auditar e testar formulários na página atual. Detecta campos obrigatórios, validação HTML5 (required, pattern, minlength, maxlength, type), estados de erro, e testa submissão sem enviar (preventDefault).",
   args: {
-    action: z.string().optional().describe("Ação: 'audit' (padrão, apenas inspeciona), 'test' (tenta submeter com preventDefault)"),
+    action: z.string().max(100).optional().describe("Ação: 'audit' (padrão, apenas inspeciona), 'test' (tenta submeter com preventDefault)"),
   },
   async execute(args: { action?: string }) {
     const page = await getPage();

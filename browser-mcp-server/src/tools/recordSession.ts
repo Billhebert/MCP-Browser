@@ -7,8 +7,8 @@ export const recordSessionTool: ToolDefinition = {
   description:
     "Gravar uma sessão de navegação usando Playwright Tracing. Gera um arquivo .zip com trace que pode ser visualizado em https://trace.playwright.dev/. Útil para debug de fluxos complexos.",
   args: {
-    action: z.string().describe("Ação: 'start' (inicia gravação), 'stop' (finaliza e retorna link), 'status' (verifica se está gravando)"),
-    name: z.string().optional().describe("Nome do snapshot (opcional, usado com stop)"),
+    action: z.string().max(100).describe("Ação: 'start' (inicia gravação), 'stop' (finaliza e retorna link), 'status' (verifica se está gravando)"),
+    name: z.string().max(500).optional().describe("Nome do snapshot (opcional, usado com stop)"),
   },
   async execute(args: { action: string; name?: string }) {
     const ctx = await getContext();

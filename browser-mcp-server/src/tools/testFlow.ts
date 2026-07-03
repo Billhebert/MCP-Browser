@@ -7,8 +7,8 @@ export const testFlowTool: ToolDefinition = {
   description:
     "Executar um fluxo de usuário gravado (teste E2E simples). Recebe um array de steps: { action: 'navigate'|'click'|'fill'|'select'|'wait'|'assert_text'|'assert_url'|'screenshot', selector?, value?, url?, text?, timeout? }. Retorna resultados de cada step.",
   args: {
-    steps: z.string().describe("JSON array de steps do fluxo. Ex: [{\"action\":\"navigate\",\"url\":\"https://...\"}, {\"action\":\"click\",\"selector\":\"#btn\"}]"),
-    screenshotOnError: z.string().optional().describe("Se 'true', captura screenshot em caso de erro"),
+    steps: z.string().max(50000).describe("JSON array de steps do fluxo. Ex: [{\"action\":\"navigate\",\"url\":\"https://...\"}, {\"action\":\"click\",\"selector\":\"#btn\"}]"),
+    screenshotOnError: z.string().max(5000).optional().describe("Se 'true', captura screenshot em caso de erro"),
   },
   async execute(args: { steps: string; screenshotOnError?: string }) {
     const page = await getPage();
@@ -53,7 +53,7 @@ export const testFlowTool: ToolDefinition = {
           }
           case "assert_text": {
             if (!step.text) throw new Error("text required for assert_text");
-            const body = await page.evaluate(() => document.body.innerText);
+            const body = await page.evaluate(() => document.body.textContent);
             if (body.includes(step.text)) {
               results.push({ step: stepNum, action: "assert_text", status: "pass", message: `Text found: "${step.text}"` });
             } else {

@@ -27,15 +27,15 @@ export const checkA11yTool: ToolDefinition = {
     "Auditar acessibilidade da página atual usando axe-core WCAG 2.2 AA. Verifica violações, heading order, landmarks, focus indicators, keyboard traps. Retorna score 0-100.",
   args: {
     wcagLevel: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe("Nível WCAG: 'A', 'AA' (padrão), 'AAA'"),
     failOnSeverity: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe("Severidade mínima para falha: 'low', 'moderate', 'serious', 'critical' (padrão: 'moderate')"),
     ignoreRules: z
-      .string()
+      .string().max(5000)
       .optional()
       .describe("Lista de regras para ignorar (separadas por vírgula)"),
   },

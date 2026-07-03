@@ -20,7 +20,7 @@ export const fuzzFormTool: ToolDefinition = {
   description:
     "Testar formulários com valores extremos (XSS, SQL injection, strings longas, caracteres especiais, unicode, etc). Preenche cada campo com cada valor, verifica se a página quebra ou mostra erros. Não submete formulários.",
   args: {
-    formSelector: z.string().optional().describe("Seletor CSS do formulário a testar (padrão: primeiro form da página)"),
+    formSelector: z.string().max(2000).optional().describe("Seletor CSS do formulário a testar (padrão: primeiro form da página)"),
   },
   async execute(args: { formSelector?: string }) {
     const page = await getPage();

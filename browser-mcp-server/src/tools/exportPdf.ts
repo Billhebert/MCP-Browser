@@ -8,7 +8,7 @@ export const exportPdfTool: ToolDefinition = {
   description: "Salvar a página atual como PDF e retornar o conteúdo base64.",
   args: {
     filePath: z
-      .string()
+      .string().max(2000)
       .optional()
       .describe("Caminho opcional para salvar o PDF no disco. Se omitido, retorna base64."),
     format: z

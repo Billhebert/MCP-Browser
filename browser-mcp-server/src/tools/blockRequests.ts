@@ -8,7 +8,7 @@ export const blockRequestsTool: ToolDefinition = {
     "Bloquear requisições de rede para domínios/URLs específicos. Útil para bloquear anúncios, analytics ou scripts lentos. Use clear=true para limpar todos os bloqueios.",
   args: {
     patterns: z
-      .array(z.string())
+      .array(z.string().max(100))
       .optional()
       .describe(
         "Lista de padrões de URL para bloquear (ex: ['google-analytics.com', 'facebook.net'])",

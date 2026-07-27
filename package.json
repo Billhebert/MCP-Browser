@@ -1,0 +1,38 @@
+{
+  "name": "mcp-browser",
+  "version": "1.0.0",
+  "description": "MCP server for browser automation via Playwright. Provides a comprehensive set of tools for web navigation, testing, auditing, and analysis.",
+  "main": "index.js",
+  "scripts": {
+    "prepare": "husky",
+    "lint": "cd browser-mcp-server && npm run lint",
+    "format": "cd browser-mcp-server && npm run format",
+    "typecheck": "cd browser-mcp-server && npm run typecheck",
+    "test": "cd browser-mcp-server && npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Billhebert/MCP-Browser.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Billhebert/MCP-Browser/issues"
+  },
+  "homepage": "https://github.com/Billhebert/MCP-Browser#readme",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.2.0"
+  },
+  "lint-staged": {
+    "browser-mcp-server/src/**/*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "browser-mcp-server/tests/**/*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}

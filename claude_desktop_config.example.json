@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "bvp-browser": {
+      "command": "npx",
+      "args": ["-y", "@bvp/browser-mcp-server"],
+      "env": {
+        "BROWSER_HEADLESS": "false",
+        "BVP_API_KEY": "your-api-key-here"
+      }
+    },
+    "bvp-browser-dev": {
+      "command": "npx",
+      "args": ["tsx", "/absolute/path/to/browser-mcp-server/src/index.ts"],
+      "env": {
+        "BROWSER_HEADLESS": "false"
+      }
+    },
+    "bvp-browser-docker": {
+      "command": "docker",
+      "args": [
+        "compose",
+        "-f",
+        "/absolute/path/to/browser-mcp-server/docker-compose.yml",
+        "up",
+        "--build"
+      ]
+    }
+  }
+}

@@ -1,4 +1,4 @@
-let PNG: any = null;
+let PNG: typeof import("pngjs").PNG | null = null;
 
 async function loadDeps(): Promise<void> {
   if (PNG) return;
@@ -15,7 +15,7 @@ export async function maskSensitiveRegions(
   regions: Array<{ x: number; y: number; width: number; height: number }>,
 ): Promise<Buffer> {
   await loadDeps();
-  const img = PNG.sync.read(screenshotBuffer);
+  const img = PNG!.sync.read(screenshotBuffer);
   for (const region of regions) {
     const x = Math.max(0, Math.floor(region.x));
     const y = Math.max(0, Math.floor(region.y));
@@ -32,5 +32,5 @@ export async function maskSensitiveRegions(
       }
     }
   }
-  return PNG.sync.write(img);
+  return PNG!.sync.write(img);
 }

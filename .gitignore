@@ -5,6 +5,9 @@ dist/
 *.log
 .DS_Store
 coverage/
+.vscode/
+.idea/
 *.tsbuildinfo
 .bvp-browser-profile/
 .bvp-extensions/
+audit/

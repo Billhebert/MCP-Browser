@@ -42,7 +42,32 @@ const performanceMarks: Array<{ name: string; time: number; data?: string }> = [
 let lastOperation: Promise<unknown> = Promise.resolve();
 let pageLoadTimeout = 30000;
 
+const BROWSER_IDLE_TIMEOUT_MS = parseInt(process.env.BVP_BROWSER_IDLE_TIMEOUT || "300000", 10);
+let idleTimer: ReturnType<typeof setTimeout> | null = null;
+let lastActivity = Date.now();
+const MEMORY_WARN_THRESHOLD = 0.8;
+
 const EXTENSIONS_DIR = path.join(os.homedir(), ".bvp-extensions");
+
+export function touchActivity() {
+  lastActivity = Date.now();
+  if (idleTimer) clearTimeout(idleTimer);
+  if (BROWSER_IDLE_TIMEOUT_MS > 0) {
+    idleTimer = setTimeout(async () => {
+      if (Date.now() - lastActivity >= BROWSER_IDLE_TIMEOUT_MS && browser) {
+        console.error(`⏰ Browser idle timeout reached (${BROWSER_IDLE_TIMEOUT_MS / 1000}s). Closing...`);
+        await closeBrowser();
+      }
+    }, BROWSER_IDLE_TIMEOUT_MS);
+  }
+}
+
+export function getLogMemoryUsage(): { consoleLogsBytes: number; networkLogsBytes: number; totalBytes: number; warning: boolean } {
+  const consoleBytes = consoleLogs.reduce((acc, l) => acc + l.text.length * 2 + 30, 0);
+  const networkBytes = networkLogs.reduce((acc, l) => acc + l.url.length * 2 + 200, 0);
+  const total = consoleBytes + networkBytes;
+  return { consoleLogsBytes: consoleBytes, networkLogsBytes: networkBytes, totalBytes: total, warning: total > MEMORY_WARN_THRESHOLD * 5_000_000 };
+}
 
 export async function serialized<T>(fn: () => Promise<T>): Promise<T> {
   const result = lastOperation.then(fn, fn);
@@ -240,7 +265,7 @@ export async function setupPageListeners(p: Page): Promise<void> {
     consoleLogs.push({ type: "pageerror", text: err.message, timestamp: Date.now() });
   });
   p.on("request", onRequest);
-  (p as any).on("response", onResponse);
+  p.on("response", onResponse);
   p.on("crash", () => {
     console.error(`💥 [Browser page crash] A página quebrou!`);
     consoleLogs.push({ type: "pageerror", text: "PAGE_CRASH", timestamp: Date.now() });

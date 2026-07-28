@@ -1,0 +1,120 @@
+site_name: MCP-Browser
+site_description: MCP server for browser automation via Playwright — 130+ tools for navigation, testing, auditing, and analysis
+site_url: https://billhebert.github.io/MCP-Browser
+repo_url: https://github.com/Billhebert/MCP-Browser
+repo_name: Billhebert/MCP-Browser
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: en
+  logo: assets/logo.svg
+  favicon: assets/favicon.ico
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.path
+    - navigation.indexes
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Billhebert/MCP-Browser
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/r/bvp/browser-mcp
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - offline
+
+nav:
+  - Home: index.md
+  - Architecture:
+    - Overview: architecture/overview.md
+    - Component Diagram (C4): architecture/c4-component.md
+    - Sequence Diagram — CallTool: architecture/calltool-sequence.md
+    - State Diagram — Browser Session: architecture/session-state.md
+    - Activity Diagram — Pipeline: architecture/pipeline-activity.md
+    - Deployment Diagram: architecture/deployment.md
+    - Package Diagram: architecture/packages.md
+    - Class Diagram (C4 Level 3): architecture/class-diagram.md
+    - Data Flow Diagram: architecture/data-flow.md
+    - Dual Transport: architecture/dual-transport.md
+    - Middleware Pipeline: architecture/middleware-pipeline.md
+    - Startup Sequence: architecture/startup.md
+  - Tools:
+    - Overview: tools/overview.md
+    - Navigation & Interaction: tools/navigation.md
+    - Data Extraction: tools/extraction.md
+    - Audit & Quality: tools/audit.md
+    - Performance: tools/performance.md
+    - Security: tools/security.md
+    - SQL & Database: tools/sql.md
+    - Storybook: tools/storybook.md
+    - Frontend & Components: tools/frontend.md
+    - Sessions & Snapshots: tools/sessions.md
+    - Webhooks & Notifications: tools/webhooks.md
+    - Advanced Testing: tools/advanced-testing.md
+  - "Decisions (ADR)":
+    - "ADR-001: Transport Selection": adr/ADR-001-transport-selection.md
+    - "ADR-002: Auto-Discovery": adr/ADR-002-auto-discovery.md
+    - "ADR-003: Middleware Pipeline": adr/ADR-003-middleware-pipeline.md
+    - "ADR-004: Dual Write Audit": adr/ADR-004-sqlite-jsonl-dual-write.md
+    - "ADR-005: Serialized Execution": adr/ADR-005-serialized-execution.md
+  - Operations:
+    - Production Runbook: operations/runbook.md
+    - SLOs & SLIs: operations/slos-slis.md
+    - Postmortem Template: operations/postmortem-template.md
+    - Benchmarks: operations/benchmarks.md
+    - Grafana Dashboard: operations/grafana.md
+    - Alert Rules: operations/alert-rules.md
+  - Security:
+    - Threat Model (STRIDE): security/threat-model.md
+    - Environment Variables: security/env-config.md
+  - Development:
+    - Getting Started: development/getting-started.md
+    - Contributing: development/contributing.md
+    - Adding a New Tool: development/new-tool.md
+    - Running Tests: development/tests.md
+  - API Reference:
+    - REST API: api/rest.md
+    - WebSocket API: api/websocket.md
+    - MCP Protocol: api/mcp.md
+  - Roadmap: roadmap.md
+  - Changelog: changelog.md

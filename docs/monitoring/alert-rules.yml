@@ -1,0 +1,59 @@
+# Prometheus Alert Rules
+groups:
+  - name: mcp-browser
+    interval: 30s
+    rules:
+
+      # High error rate in last 5 minutes
+      - alert: HighErrorRate
+        expr: rate(bvp_errors_total[5m]) / rate(bvp_requests_total[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Error rate {{ $value | humanizePercentage }} in last 5 minutes"
+
+      # Tool latency p95 above threshold
+      - alert: HighToolLatency
+        expr: bvp_tool_duration_ms_avg > 2000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Tool {{ $labels.tool }} average latency {{ $value }}ms"
+
+      # Memory usage above 80%
+      - alert: HighMemoryUsage
+        expr: bvp_process_memory_bytes{type="rss"} > 800 * 1024 * 1024
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "RSS memory {{ $value | humanize1024 }} above 800MB"
+
+      # Server has restarted (uptime reset)
+      - alert: ServerRestarted
+        expr: bvp_uptime_seconds < 60
+        for: 1m
+        labels:
+          severity: info
+        annotations:
+          summary: "Server restarted {{ $value }} seconds ago"
+
+      # No requests in last 5 minutes
+      - alert: NoTraffic
+        expr: rate(bvp_requests_total[5m]) == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "No requests received in last 5 minutes"
+
+      # Tool error rate per tool > 10%
+      - alert: ToolErrorRate
+        expr: bvp_tool_errors_total / bvp_tool_calls_total > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Tool {{ $labels.tool }} error rate {{ $value | humanizePercentage }}"

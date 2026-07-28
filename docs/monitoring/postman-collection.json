@@ -1,0 +1,48 @@
+{
+  "info": {
+    "name": "MCP-Browser API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/health"
+      }
+    },
+    {
+      "name": "List Tools",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/tools"
+      }
+    },
+    {
+      "name": "Execute navigate",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/tools/navigate/execute",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"args\":{\"url\":\"https://example.com\"}}"
+        }
+      }
+    },
+    {
+      "name": "List Sessions",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/sessions"
+      }
+    },
+    {
+      "name": "Server Stats",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/stats"
+      }
+    }
+  ]
+}

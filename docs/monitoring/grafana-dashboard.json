@@ -1,0 +1,48 @@
+{
+  "title": "MCP-Browser Dashboard",
+  "version": 1,
+  "panels": [
+    {
+      "title": "Request Rate",
+      "type": "graph",
+      "targets": [
+        { "expr": "rate(bvp_requests_total[1m])", "legendFormat": "requests/s" },
+        { "expr": "rate(bvp_errors_total[1m])", "legendFormat": "errors/s" }
+      ]
+    },
+    {
+      "title": "Tool Latency (p50)",
+      "type": "graph",
+      "targets": [
+        { "expr": "bvp_tool_duration_ms_avg", "legendFormat": "{{tool}}" }
+      ]
+    },
+    {
+      "title": "Tool Calls per Tool (top 10)",
+      "type": "piechart",
+      "targets": [
+        { "expr": "topk(10, bvp_tool_calls_total)", "legendFormat": "{{tool}}" }
+      ]
+    },
+    {
+      "title": "Memory Usage",
+      "type": "graph",
+      "targets": [
+        { "expr": "bvp_process_memory_bytes{type=\"rss\"}", "legendFormat": "RSS" },
+        { "expr": "bvp_process_memory_bytes{type=\"heap_used\"}", "legendFormat": "Heap Used" }
+      ]
+    },
+    {
+      "title": "Error Rate by Tool",
+      "type": "table",
+      "targets": [
+        { "expr": "bvp_tool_errors_total / bvp_tool_calls_total", "legendFormat": "{{tool}}" }
+      ]
+    },
+    {
+      "title": "Uptime",
+      "type": "stat",
+      "targets": [{ "expr": "bvp_uptime_seconds" }]
+    }
+  ]
+}

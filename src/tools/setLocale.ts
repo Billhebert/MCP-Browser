@@ -1,0 +1,34 @@
+import { z } from "zod";
+import type { ToolDefinition } from "../types.js";
+import { getContext } from "../browser.js";
+
+export const setLocaleTool: ToolDefinition = {
+  name: "set_locale",
+  description: "Change browser locale for the session.",
+  args: {
+    locale: z.string().max(100).describe("Código do locale (ex: 'pt-BR', 'en-US', 'es', 'fr-FR')"),
+  },
+  async execute({ locale }: { locale: string }) {
+    console.error(`🌍 Alterando locale para: ${locale}`);
+
+    const ctx = await getContext();
+    await ctx.setExtraHTTPHeaders({
+      "Accept-Language": locale,
+    });
+
+    // Set locale via CDP
+    const cdpSession = await ctx.newCDPSession(await ctx.newPage());
+    await cdpSession.send("Emulation.setLocaleOverride", { locale });
+    await cdpSession.detach();
+
+    console.error(`✅ Locale alterado: ${locale}`);
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify({ success: true, locale }),
+        },
+      ],
+    };
+  },
+};

@@ -1,0 +1,612 @@
+openapi: "3.1.0"
+info:
+  title: MCP-Browser REST API
+  description: |
+    REST API for the MCP-Browser server. Provides programmatic access to browser
+    automation tools, audit history, session management, and server monitoring.
+
+    The server also exposes MCP protocol over stdio (for Claude Desktop) and
+    WebSocket (for real-time tool execution).
+  version: "1.0.0"
+  contact:
+    name: BVP Engineering
+    url: https://github.com/Billhebert/MCP-Browser
+
+servers:
+  - url: http://localhost:3100
+    description: Local development server
+  - url: https://bvp-browser.prod.internal:3100
+    description: Production server
+
+paths:
+  /api/health:
+    get:
+      summary: Health check
+      description: Returns server health status, version, and timestamp.
+      operationId: healthCheck
+      responses:
+        "200":
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                    example: "ok"
+                  timestamp:
+                    type: string
+                    format: date-time
+                  version:
+                    type: string
+                    example: "1.0.0"
+        "503":
+          description: Server is unhealthy
+
+  /api/tools:
+    get:
+      summary: List all tools
+      description: Returns all registered MCP tools with their names, descriptions, and argument schemas.
+      operationId: listTools
+      responses:
+        "200":
+          description: Tools list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tools:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ToolInfo"
+                  count:
+                    type: integer
+                    example: 129
+
+  /api/tools/{name}:
+    get:
+      summary: Get tool details
+      description: Returns detailed information about a specific tool.
+      operationId: getTool
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+            example: navigate
+      responses:
+        "200":
+          description: Tool details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ToolInfo"
+        "404":
+          description: Tool not found
+
+  /api/tools/{name}/execute:
+    post:
+      summary: Execute a tool
+      description: Executes a tool with the given arguments and returns the result.
+      operationId: executeTool
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+            example: navigate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                args:
+                  type: object
+                  description: Tool arguments (varies by tool)
+                  example:
+                    url: "https://example.com"
+                sessionId:
+                  type: string
+                  description: Session ID (optional, defaults to current)
+                  example: "session_1234_abcd"
+              required: [args]
+      responses:
+        "200":
+          description: Tool execution result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ToolResult"
+        "400":
+          description: Invalid arguments
+        "401":
+          description: Unauthorized (missing/ invalid API key)
+        "404":
+          description: Tool not found
+        "429":
+          description: Rate limit exceeded
+        "500":
+          description: Internal server error
+
+  /api/audits:
+    get:
+      summary: List audits
+      description: Returns the audit trail of recent tool executions.
+      operationId: listAudits
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 200
+            maximum: 1000
+      responses:
+        "200":
+          description: Audit list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  audits:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AuditEntry"
+
+  /api/audits/stats:
+    get:
+      summary: Audit statistics
+      description: Aggregate statistics about tool executions.
+      operationId: auditStats
+      responses:
+        "200":
+          description: Audit statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    example: 1500
+                  errors:
+                    type: integer
+                    example: 23
+                  topTools:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tool:
+                          type: string
+                        count:
+                          type: integer
+
+  /api/stats:
+    get:
+      summary: Server statistics
+      description: General server statistics including version, uptime, tool and plugin counts.
+      operationId: serverStats
+      responses:
+        "200":
+          description: Server statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                    example: "1.0.0"
+                  uptime:
+                    type: number
+                    example: 86400
+                  toolCount:
+                    type: integer
+                    example: 129
+                  pluginCount:
+                    type: integer
+                    example: 0
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /api/sessions:
+    get:
+      summary: List sessions
+      description: Lists all active browser sessions.
+      operationId: listSessions
+      responses:
+        "200":
+          description: Session list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SessionInfo"
+                  current:
+                    type: string
+                    example: "default"
+    post:
+      summary: Create session
+      description: Creates a new browser session.
+      operationId: createSession
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                label:
+                  type: string
+                  example: "QA Test Run"
+      responses:
+        "201":
+          description: Session created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  label:
+                    type: string
+
+  /api/sessions/{id}:
+    get:
+      summary: Get session details
+      operationId: getSession
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Session details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionInfo"
+        "404":
+          description: Session not found
+
+  /api/sessions/{id}/switch:
+    post:
+      summary: Switch to session
+      description: Switches the active browser session.
+      operationId: switchSession
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Session switched
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  current:
+                    type: string
+        "404":
+          description: Session not found
+
+  /api/sessions/{id}/close:
+    post:
+      summary: Close session
+      description: Closes a browser session and releases its resources.
+      operationId: closeSession
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Session closed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  closed:
+                    type: string
+        "404":
+          description: Session not found
+
+  /api/settings:
+    get:
+      summary: List settings
+      description: Returns all persisted settings.
+      operationId: listSettings
+      responses:
+        "200":
+          description: Settings list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  settings:
+                    type: object
+                    additionalProperties:
+                      type: string
+
+  /api/settings/{key}:
+    post:
+      summary: Update setting
+      description: Sets a configuration value.
+      operationId: setSetting
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [value]
+              properties:
+                value:
+                  type: string
+      responses:
+        "200":
+          description: Setting updated
+
+  /api/snapshots:
+    get:
+      summary: List snapshots
+      description: Lists all saved browser state snapshots.
+      operationId: listSnapshots
+      responses:
+        "200":
+          description: Snapshots list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  snapshots:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        created_at:
+                          type: string
+                          format: date-time
+                        tags:
+                          type: array
+                          items:
+                            type: string
+    post:
+      summary: Save snapshot
+      description: Saves a named browser state snapshot.
+      operationId: saveSnapshot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, data]
+              properties:
+                name:
+                  type: string
+                data:
+                  type: object
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "201":
+          description: Snapshot saved
+
+  /api/snapshots/{name}:
+    get:
+      summary: Get snapshot
+      operationId: getSnapshot
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Snapshot data
+        "404":
+          description: Snapshot not found
+    delete:
+      summary: Delete snapshot
+      operationId: deleteSnapshot
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Snapshot deleted
+
+  /api/plugins:
+    get:
+      summary: List plugins
+      operationId: listPlugins
+      responses:
+        "200":
+          description: Plugins list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plugins:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        version:
+                          type: string
+                        description:
+                          type: string
+                        enabled:
+                          type: boolean
+                        installed_at:
+                          type: string
+                          format: date-time
+
+  /api/plugins/{name}/toggle:
+    post:
+      summary: Toggle plugin
+      operationId: togglePlugin
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [enabled]
+              properties:
+                enabled:
+                  type: boolean
+      responses:
+        "200":
+          description: Plugin toggled
+
+components:
+  schemas:
+    ToolInfo:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "navigate"
+        description:
+          type: string
+          example: "Navigate to a URL. Returns page title and URL."
+        args:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              type:
+                type: string
+                enum: [string, number, boolean, array]
+              description:
+                type: string
+              required:
+                type: boolean
+
+    ToolResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        result:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: [text, image, resource]
+              text:
+                type: string
+              data:
+                type: string
+                description: Base64-encoded binary data (for images)
+              mimeType:
+                type: string
+        isError:
+          type: boolean
+        sessionId:
+          type: string
+
+    AuditEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+        tool:
+          type: string
+        user:
+          type: string
+        session:
+          type: string
+        args:
+          type: object
+        result:
+          type: object
+          properties:
+            status:
+              type: string
+              enum: [pass, fail]
+            score:
+              type: number
+            issueCount:
+              type: integer
+        duration_ms:
+          type: integer
+
+    SessionInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        createdAt:
+          type: number
+        lastActivity:
+          type: number
+        status:
+          type: string
+          enum: [active, closed]
+        consoleLogCount:
+          type: integer
+        networkLogCount:
+          type: integer
+        isCurrent:
+          type: boolean
+        url:
+          type: string
+          nullable: true

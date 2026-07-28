@@ -1,0 +1,2 @@
+import{z}from"zod";
+export interface ToolDefinition{name:string;description:string;args:Record<string,z.ZodType>;execute:(args:any)=>Promise<{content:Array<{type:string;text?:string;data?:string;mimeType?:string}>;isError?:boolean}>}

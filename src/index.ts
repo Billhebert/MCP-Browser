@@ -39,7 +39,7 @@ setToolExecutor(async (name: string, args: Record<string, unknown>) => {
 });
 
 const server = new Server(
-  { name: "bvp-browser", version: "0.3.0" },
+  { name: "bvp-browser", version: "0.5.0" },
   { capabilities: { tools: {}, resources: {}, prompts: {} } },
 );
 

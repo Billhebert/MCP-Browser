@@ -1,18 +1,4 @@
 ﻿import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { listTabsTool } from "./tools/listTabs.js";
-import { closeBrowserTool } from "./tools/closeBrowser.js";
-import { waitTool } from "./tools/wait.js";
-import { setCookiesTool } from "./tools/setCookies.js";
-import { getCookiesTool } from "./tools/getCookies.js";
-import { getNetworkTool } from "./tools/getNetwork.js";
-import { getConsoleTool } from "./tools/getConsole.js";
-import { executeJsTool } from "./tools/executeJs.js";
-import { getHtmlTool } from "./tools/getHtml.js";
-import { refreshTool } from "./tools/refresh.js";
-import { goBackTool } from "./tools/goBack.js";
-import { pressKeyTool } from "./tools/pressKey.js";
-import { hoverTool } from "./tools/hover.js";
-import { selectTool } from "./tools/select.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   CallToolRequestSchema,
@@ -53,7 +39,7 @@ setToolExecutor(async (name: string, args: Record<string, unknown>) => {
 });
 
 const server = new Server(
-  { name: "bvp-browser", version: "0.2.0" },
+  { name: "bvp-browser", version: "0.3.0" },
   { capabilities: { tools: {}, resources: {}, prompts: {} } },
 );
 

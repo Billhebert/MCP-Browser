@@ -1,1 +1,1 @@
-npx lint-staged
+cd browser-mcp-server && npx lint-staged --allow-empty

@@ -1,16 +1,15 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const getHtmlTool: ToolDefinition = {
   name: "get_html",
-  description:
-    "Extrair o HTML da página toda ou de um elemento específico. Retorna até 10000 caracteres.",
+  description: "Extract innerHTML or outerHTML from an element.",
   args: {
     selector: z
       .string().max(2000)
       .optional()
-      .describe("Seletor CSS opcional. Se omitido, extrai o HTML da página inteira."),
+      .describe("CSS selector optional. Se omitido, extrai o HTML da page inteira."),
   },
   async execute({ selector }: { selector?: string }) {
     const page = await getPage();
@@ -20,7 +19,7 @@ export const getHtmlTool: ToolDefinition = {
       const el = await page.$(selector);
       if (!el) {
         return {
-          content: [{ type: "text", text: `Elemento não encontrado: ${selector}` }],
+          content: [{ type: "text", text: `Element não encontrado: ${selector}` }],
           isError: true,
         };
       }

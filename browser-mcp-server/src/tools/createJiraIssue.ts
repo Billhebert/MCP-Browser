@@ -1,10 +1,9 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 
 export const createJiraIssueTool: ToolDefinition = {
   name: "create_jira_issue",
-  description:
-    "Criar ticket no Jira a partir de resultado de auditoria. Requer JIRA_HOST, JIRA_EMAIL, JIRA_TOKEN variáveis de ambiente. Cria issue com título, descrição, prioridade e labels baseados no resultado da auditoria.",
+  description: "Create a Jira issue from audit results.",
   args: {
     project: z.string().max(500).describe("Chave do projeto Jira (ex: 'PROJ', 'QA')"),
     summary: z.string().max(5000).describe("Título resumido do issue (ex: 'Auditoria SEO - missing meta description')"),

@@ -1,14 +1,13 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const mockApiTool: ToolDefinition = {
   name: "mock_api",
-  description:
-    "Interceptar e mockar requisições de API na página atual. Permite simular respostas de endpoints específicos sem chamá-los realmente. Útil para testar cenários de erro, loading, e dados mockados.",
+  description: "Mock API responses by intercepting network requests.",
   args: {
     mocks: z.string().max(50000).describe("JSON array de mocks: [{\"url\":\"https://api.exemplo.com/users\",\"status\":200,\"body\":\"{\\\"data\\\":[]}\",\"method\":\"GET\"}]"),
-    clear: z.string().max(5000).optional().describe("Se 'true', remove todos os mocks ativos em vez de adicionar"),
+    clear: z.string().max(5000).optional().describe("Se 'true', remove todos os mocks ativos em vez de add"),
   },
   async execute(args: { mocks: string; clear?: string }) {
     const page = await getPage();

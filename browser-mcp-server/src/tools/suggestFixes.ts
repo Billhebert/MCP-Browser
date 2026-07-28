@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 
 const FIX_STRATEGIES: Record<string, Array<{ condition: string; fix: string }>> = {
   seo: [
@@ -12,8 +12,8 @@ const FIX_STRATEGIES: Record<string, Array<{ condition: string; fix: string }>> 
     { condition: "ratio", fix: "Aumente o contraste entre cor do texto e fundo. Use ferramenta como WebAIM Color Contrast Checker" },
   ],
   a11y_violation: [
-    { condition: "aria", fix: "Adicione atributos ARIA apropriados ou use elementos HTML semânticos" },
-    { condition: "keyboard", fix: "Garanta que todos os elementos interativos sejam acessíveis por teclado (Tab, Enter)" },
+    { condition: "aria", fix: "Adicione atributos ARIA apropriados ou use elements HTML semânticos" },
+    { condition: "keyboard", fix: "Garanta que todos os elements interativos sejam acessíveis por teclado (Tab, Enter)" },
   ],
   image: [
     { condition: "no alt", fix: "Adicione `alt` descritivo (para conteúdo) ou `alt=\"\"` (decorativa)" },
@@ -39,15 +39,14 @@ function findFix(issue: { type?: string; message?: string }): string {
   for (const strategy of category) {
     if (msg.includes(strategy.condition.toLowerCase())) return strategy.fix;
   }
-  return "Revise o elemento manualmente. Considere boas práticas de acessibilidade, performance e segurança.";
+  return "Revise o element manualmente. Considere boas práticas de acessibilidade, performance e segurança.";
 }
 
 export const suggestFixesTool: ToolDefinition = {
   name: "suggest_fixes",
-  description:
-    "Analisar o JSON de resultado de qualquer ferramenta de auditoria e sugerir correções específicas para cada issue encontrada. Recebe o output JSON de qualquer tool (analyze_seo, check_contrast, etc.) e retorna sugestões acionáveis.",
+  description: "Analyze issues and suggest automated fixes.",
   args: {
-    data: z.string().max(50000).describe("JSON string com o resultado de uma ferramenta de auditoria (analyze_seo, check_contrast, etc.)"),
+    data: z.string().max(50000).describe("JSON string with o resultado de uma ferramenta de auditoria (analyze_seo, check_contrast, etc.)"),
   },
   async execute(args: { data: string }) {
     const data = JSON.parse(args.data) as Record<string, unknown>;

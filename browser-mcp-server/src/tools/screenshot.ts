@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 import { maskSensitiveRegions } from "../corporate/dataMasker.js";
 
@@ -19,19 +19,23 @@ async function detectSensitiveRegions(page: import("playwright").Page) {
 
 export const screenshotTool: ToolDefinition = {
   name: "screenshot",
-  description:
-    "Capturar um screenshot da página atual. Retorna como imagem base64. Modo 'corporate' (padrão detecta automaticamente regiões sensíveis como formulários e aplica blur). Use mask=false para desabilitar.",
+  description: "Capture a screenshot of the current page as base64 image. Auto-masks sensitive regions (forms, inputs) by default. Use mask=false to disable.",
   args: {
-    mask: z.string().max(5000).optional().describe("Se 'false' desabilita blur automático em áreas sensíveis. Padrão: detecta automático"),
-    fullPage: z.string().max(5000).optional().describe("Se 'true', captura página completa (rolável). Padrão: 'false'"),
+    mask: z.boolean().optional().describe("Auto-blur sensitive regions. Default: true"),
+    fullPage: z.boolean().optional().describe("Capture full scrollable page. Default: false"),
   },
-  async execute(args: { mask?: string; fullPage?: string }) {
+  async execute(args: { mask?: boolean; fullPage?: boolean }) {
     const page = await getPage();
-    const doMask = args.mask !== "false";
-    const fullPage = args.fullPage === "true";
+    const doMask = args.mask !== false;
+    const fullPage = args.fullPage === true;
 
-    console.error(`📸 Capturando screenshot...`);
-    const screenshot = await page.screenshot({ type: "png", fullPage });
+    console.error(`📸 Taking screenshot...`);
+    let screenshot: Buffer;
+    try {
+      screenshot = await page.screenshot({ type: "png", fullPage });
+    } catch (err) {
+      return { content: [{ type: "text", text: JSON.stringify({ error: `Screenshot failed: ${(err as Error).message}` }) }], isError: true };
+    }
     let finalBuf = screenshot;
 
     if (doMask) {

@@ -1,10 +1,9 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const checkTypographyTool: ToolDefinition = {
   name: "check_typography",
-  description:
-    "Auditar tipografia da página: fontes carregadas, hierarquia de headings, tamanhos, line-height, contraste de font-size entre níveis, consistência de famílias.",
+  description: "Audit typography: sizes, line heights, font stacks, overflow.",
   args: {},
   async execute() {
     const page = await getPage();

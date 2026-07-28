@@ -1,11 +1,10 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage, getConsoleLogs, clearConsoleLogs } from "../browser.js";
 
 export const checkConsoleErrorsTool: ToolDefinition = {
   name: "check_console_errors",
-  description:
-    "Analisar erros do console do navegador na página atual. Categoriza por tipo (JS error, warning, network, promise rejection, React error), agrupa por mensagem, e classifica por severidade.",
+  description: "Analyze browser console for errors and warnings.",
   args: {
     clear: z.string().max(5000).optional().describe("Se 'true', limpa os logs após análise"),
   },

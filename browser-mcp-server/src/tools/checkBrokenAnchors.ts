@@ -1,10 +1,9 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const checkBrokenAnchorsTool: ToolDefinition = {
   name: "check_broken_anchors",
-  description:
-    "Verificar links internos com fragmento (#id) na página atual. Detecta referências a IDs que não existem no DOM, links duplicados, e âncoras vazias.",
+  description: "Check for broken anchor links that don't match element IDs.",
   args: {},
   async execute() {
     const page = await getPage();

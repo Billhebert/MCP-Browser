@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { isSafeUrl } from "../corporate/ssrf.js";
 import { withRetry } from "../corporate/retry.js";
 
@@ -25,19 +25,18 @@ function parseDuration(duration: string): number {
 
 export const loadTestTool: ToolDefinition = {
   name: "load_test",
-  description:
-    "Executar teste de carga em uma URL usando Node.js fetch (não usa o navegador). Suporta perfis smoke/load/stress/spike/soak com múltiplos VUs concorrentes. Retorna p50/p95/p99, throughput, taxa de erro.",
+  description: "Run load test by repeatedly navigating. Reports average, min, max.",
   args: {
-    url: z.string().max(5000).describe("URL para testar"),
+    url: z.string().max(5000).describe("URL para test"),
     profile: z
       .string().max(5000)
       .optional()
       .describe("Perfil de carga: 'smoke' (padrão), 'load', 'stress', 'spike', 'soak'"),
-    vus: z.string().max(5000).optional().describe("Número de usuários virtuais simultâneos (sobrescreve o perfil)"),
+    vus: z.string().max(5000).optional().describe("Número de usuários virtuais simultâneos (aboutscreve o perfil)"),
     duration: z.string().max(100).optional().describe("Duração em segundos (ex: '30s') ou usar perfil"),
-    p95Threshold: z.string().max(5000).optional().describe("Threshold p95 em ms (padrão: 2000)"),
-    errorRateThreshold: z.string().max(5000).optional().describe("Threshold taxa de erro (padrão: 0.05 = 5%)"),
-    rampUp: z.string().max(5000).optional().describe("Tempo de ramp-up em ms (padrão: 20% da duração)"),
+    p95Threshold: z.string().max(5000).optional().describe("Threshold p95 em ms (default: 2000)"),
+    errorRateThreshold: z.string().max(5000).optional().describe("Threshold taxa de erro (default: 0.05 = 5%)"),
+    rampUp: z.string().max(5000).optional().describe("Tempo de ramp-up em ms (default: 20% da duraction)"),
   },
   async execute(args: {
     url: string;

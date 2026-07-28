@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage, getConsoleLogs } from "../browser.js";
 import { isSafeUrl } from "../corporate/ssrf.js";
 
@@ -35,25 +35,18 @@ function isSameOrigin(a: string, b: string): boolean {
 
 export const checkLinksTool: ToolDefinition = {
   name: "check_links",
-  description:
-    "Verificar links quebrados na página atual. Escaneia todos <a href>, faz requisição HEAD para cada um, e reporta 4xx/5xx/redirects. Opcionalmente verifica links externos e console errors.",
+  description: "Check for broken links. Scans all anchor href attributes, makes HEAD requests.",
   args: {
-    checkExternal: z
-      .string().max(5000)
-      .optional()
-      .describe("Se 'true', verifica também links externos (padrão: apenas mesmo domínio)"),
-    maxChecks: z.string().max(100).optional().describe("Número máximo de links para verificar (padrão: 50)"),
-    includeConsole: z
-      .string().max(5000)
-      .optional()
-      .describe("Se 'true', inclui console errors/warnings da página no resultado"),
+    checkExternal: z.boolean().optional().describe("Check external links too. Default: false (same domain only)"),
+    maxChecks: z.number().int().positive().optional().describe("Maximum links to check. Default: 50"),
+    includeConsole: z.boolean().optional().describe("Include console errors/warnings in results. Default: false"),
   },
-  async execute(args: { checkExternal?: string; maxChecks?: string; includeConsole?: string }) {
+  async execute(args: { checkExternal?: boolean; maxChecks?: number; includeConsole?: boolean }) {
     const page = await getPage();
     const url = page.url();
-    const checkExternal = args.checkExternal === "true";
-    const maxChecks = parseInt(args.maxChecks || "50", 10);
-    const includeConsole = args.includeConsole === "true";
+    const checkExternal = args.checkExternal === true;
+    const maxChecks = args.maxChecks || 50;
+    const includeConsole = args.includeConsole === true;
 
     console.error(`🔗 Check links: ${url}`);
 
@@ -66,7 +59,7 @@ export const checkLinksTool: ToolDefinition = {
         .filter((l) => l.href && !l.href.startsWith("javascript:") && !l.href.startsWith("#"));
     });
 
-    console.error(`  Encontrados ${links.length} link(s)`);
+    console.error(`  Found ${links.length} link(s)`);
 
     const consoleLogs = getConsoleLogs();
     const consoleErrors = includeConsole
@@ -132,7 +125,7 @@ export const checkLinksTool: ToolDefinition = {
     const broken = issues.filter((i) => i.severity === "error").length;
     const warnings = issues.filter((i) => i.severity === "warning").length;
 
-    console.error(`  Verificados: ${checked}, Erros: ${broken}, Warnings: ${warnings}`);
+    console.error(`  Checked: ${checked}, Erros: ${broken}, Warnings: ${warnings}`);
 
     return {
       content: [

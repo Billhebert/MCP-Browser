@@ -1,11 +1,10 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getContext } from "../browser.js";
 
 export const setGeoTool: ToolDefinition = {
   name: "set_geo",
-  description:
-    "Simular uma localização geográfica no navegador. Útil para testar conteúdo regionalizado.",
+  description: "Simulate geographic location.",
   args: {
     latitude: z.number().min(-90).max(90).describe("Latitude (ex: -23.5505 para São Paulo)"),
     longitude: z.number().min(-180).max(180).describe("Longitude (ex: -46.6333 para São Paulo)"),

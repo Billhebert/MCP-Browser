@@ -1,4 +1,4 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 interface SeoPageData {
@@ -101,8 +101,7 @@ async function extractSeoData(page: any): Promise<SeoPageData> {
 
 export const analyzeSeoTool: ToolDefinition = {
   name: "analyze_seo",
-  description:
-    "Analisar SEO da página atual: title, meta description, canonical, Open Graph, Twitter Cards, hreflang, JSON-LD, headings, imagens, links, robots, viewport. Retorna score 0-100 com issues.",
+  description: "Audit page SEO: title, meta description, canonical, Open Graph, Twitter Cards, hreflang, JSON-LD, headings, images. Returns score 0-100.",
   args: {},
   async execute() {
     const page = await getPage();
@@ -177,7 +176,7 @@ export const analyzeSeoTool: ToolDefinition = {
     if (h1s.length === 0) {
       issues.push({ type: "headings", severity: "high", message: "Página sem h1" });
     } else if (h1s.length > 1) {
-      issues.push({ type: "headings", severity: "medium", message: `${h1s.length} h1 na página (recomenda-se apenas um)` });
+      issues.push({ type: "headings", severity: "medium", message: `${h1s.length} h1 na página (recomenda-se only um)` });
     }
 
     let maxLevel = 0;
@@ -211,7 +210,7 @@ export const analyzeSeoTool: ToolDefinition = {
     }
 
     if (data.wordCount < 300) {
-      issues.push({ type: "content", severity: "medium", message: `Conteúdo fino: apenas ${data.wordCount} palavras (recomendado >300)` });
+      issues.push({ type: "content", severity: "medium", message: `Conteúdo fino: only ${data.wordCount} palavras (recomendado >300)` });
     }
 
     if (!data.viewport) {

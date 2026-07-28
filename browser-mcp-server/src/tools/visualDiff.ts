@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 import { getSnapshots } from "./saveSnapshot.js";
 import pixelmatch from "pixelmatch";
@@ -7,11 +7,10 @@ import { PNG } from "pngjs";
 
 export const visualDiffTool: ToolDefinition = {
   name: "visual_diff",
-  description:
-    "Comparar screenshot atual da página com um snapshot salvo anteriormente (via save_snapshot). Gera diff visual usando pixelmatch, retorna % de diferença e imagem diff em base64. Útil para detectar mudanças visuais após ações.",
+  description: "Compare two screenshots using pixelmatch. Returns diff image.",
   args: {
-    snapshotName: z.string().max(5000).describe("Nome do snapshot salvo anteriormente para comparar"),
-    threshold: z.string().max(5000).optional().describe("Threshold de diferença (0.0-1.0, padrão: 0.02 = 2%)"),
+    snapshotName: z.string().max(5000).describe("Name do snapshot salvo anteriormente para withparar"),
+    threshold: z.string().max(5000).optional().describe("Threshold de diferença (0.0-1.0, default: 0.02 = 2%)"),
   },
   async execute(args: { snapshotName: string; threshold?: string }) {
     const page = await getPage();
@@ -30,7 +29,7 @@ export const visualDiffTool: ToolDefinition = {
     }
 
     if (baseline.url !== page.url()) {
-      console.error(`  ⚠️  URLs diferentes: snapshot=${baseline.url} atual=${page.url()}`);
+      console.error(`  ⚠️  URLs diferentes: snapshot=${baseline.url} current=${page.url()}`);
     }
 
     const baselineBuf = Buffer.from(baseline.screenshot, "base64");

@@ -1,11 +1,10 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const validateHtmlTool: ToolDefinition = {
   name: "validate_html",
-  description:
-    "Validar HTML da página atual contra o W3C Markup Validation Service. Envia o HTML para https://validator.w3.org/nu/ e retorna erros, avisos e informações. Limite: ~300KB de HTML.",
+  description: "Validate HTML: alt text, duplicate IDs, empty links, inline styles.",
   args: {
     parser: z.string().max(5000).optional().describe("Parser: 'html' (padrão) ou 'xmldoc'"),
   },

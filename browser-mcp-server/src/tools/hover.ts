@@ -1,12 +1,12 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const hoverTool: ToolDefinition = {
   name: "hover",
-  description: "Passar o mouse sobre um elemento (útil para menus dropdown que aparecem no hover).",
+  description: "Hover mouse over an element using CSS selector.",
   args: {
-    selector: z.string().max(2000).describe("Seletor CSS do elemento para passar o mouse"),
+    selector: z.string().max(2000).describe("CSS selector do element para passar o mouse"),
   },
   async execute({ selector }: { selector: string }) {
     const page = await getPage();

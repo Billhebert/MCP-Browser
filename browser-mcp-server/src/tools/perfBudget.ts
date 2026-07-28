@@ -1,11 +1,10 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage, getNetworkLogs } from "../browser.js";
 
 export const perfBudgetTool: ToolDefinition = {
   name: "perf_budget",
-  description:
-    "Validar métricas de performance da página atual contra um orçamento (budget). Verifica LCP, CLS, FCP, TBT, TTFB, número de requests e tamanho total. Retorna pass/fail por métrica.",
+  description: "Validate performance against a configurable budget.",
   args: {
     budget: z.string().max(50000).optional().describe("JSON com orçamento customizado. Ex: {\"lcp\":2500,\"cls\":0.1,\"fcp\":1800,\"ttfb\":600,\"requests\":50,\"totalSizeKB\":2000}. Valores em ms, exceto CLS e requests."),
   },

@@ -1,16 +1,15 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getCDPSession, getExtensionsDir } from "../browser.js";
 import path from "path";
 import fs from "fs";
 
 export const installExtensionTool: ToolDefinition = {
   name: "install_extension",
-  description:
-    "Instalar uma extensão do Chrome a partir de um diretório local. Aceita apenas caminho local para diretório da extensão (unpacked). Não suporta download remoto por segurança.",
+  description: "Install a Chrome extension from local path.",
   args: {
-    source: z.string().max(5000).describe("Caminho local para diretório da extensão (apenas caminho local, URLs não são suportadas)"),
-    enableInIncognito: z.boolean().optional().describe("Se true, permite a extensão em modo anônimo (padrão: false)"),
+    source: z.string().max(5000).describe("Path local para directory da extension (only Path local, URLs not são suportadas)"),
+    enableInIncognito: z.boolean().optional().describe("If true, permite a extension em modo anônimo (default: false)"),
   },
   async execute(args: { source: string; enableInIncognito?: boolean }) {
     const cdp = await getCDPSession();
@@ -18,7 +17,7 @@ export const installExtensionTool: ToolDefinition = {
 
     if (args.source.startsWith("http://") || args.source.startsWith("https://")) {
       return {
-        content: [{ type: "text", text: JSON.stringify({ error: "Download remoto não é suportado por segurança. Forneça um caminho local para o diretório da extensão." }, null, 2) }],
+        content: [{ type: "text", text: JSON.stringify({ error: "Download remoto não é suportado por segurança. Forneça um Path local para o diretório da extensão." }, null, 2) }],
         isError: true,
       };
     }
@@ -29,7 +28,7 @@ export const installExtensionTool: ToolDefinition = {
     }
     if (!fs.existsSync(installPath)) {
       return {
-        content: [{ type: "text", text: JSON.stringify({ error: `Caminho não encontrado: ${installPath}` }, null, 2) }],
+        content: [{ type: "text", text: JSON.stringify({ error: `Path não encontrado: ${installPath}` }, null, 2) }],
         isError: true,
       };
     }

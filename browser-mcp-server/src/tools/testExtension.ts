@@ -1,16 +1,15 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage, getCDPSession } from "../browser.js";
 
 export const testExtensionTool: ToolDefinition = {
   name: "test_extension",
-  description:
-    "Testar uma extensão instalada. Abre uma página de teste, dispara a extensão (browser action), captura screenshot do popup e verifica se content scripts foram injetados. Ideal para validar extensões em desenvolvimento.",
+  description: "Test a Chrome extension for console errors.",
   args: {
-    extensionId: z.string().max(500).describe("ID da extensão para testar (ex: obtido via list_extensions)"),
-    testUrl: z.string().max(5000).optional().describe("URL da página de teste (padrão: about:blank)"),
-    action: z.enum(["popup", "content_script", "both"]).optional().describe("O que testar: 'popup' (abre popup), 'content_script' (verifica injeção), 'both' (padrão)"),
-    checkConsole: z.boolean().optional().describe("Se true, captura console errors da página de teste"),
+    extensionId: z.string().max(500).describe("ID da extension para test (ex: obtido via list_extensions)"),
+    testUrl: z.string().max(5000).optional().describe("URL da page de teste (default: about:blank)"),
+    action: z.enum(["popup", "content_script", "both"]).optional().describe("O que test: 'popup' (abre popup), 'content_script' (verifica injeção), 'both' (padrão)"),
+    checkConsole: z.boolean().optional().describe("If true, captura console errors da page de teste"),
   },
   async execute(args: { extensionId: string; testUrl?: string; action?: string; checkConsole?: boolean }) {
     const page = await getPage();
@@ -70,7 +69,7 @@ export const testExtensionTool: ToolDefinition = {
             results.errors.push("Popup não abriu dentro do timeout de 5s");
           }
         } else {
-          results.errors.push("Não foi possível obter o targetId da página atual");
+          results.errors.push("Não foi possível get o targetId da página current");
         }
       } catch (err) {
         results.errors.push(`Popup test failed: ${(err as Error).message}`);

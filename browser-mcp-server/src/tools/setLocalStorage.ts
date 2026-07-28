@@ -1,20 +1,19 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const setLocalStorageTool: ToolDefinition = {
   name: "set_local_storage",
-  description:
-    "Definir valores no localStorage do navegador antes de carregar uma página. Útil para configurar tokens, preferências ou flags de feature.",
+  description: "Set localStorage items for the domain.",
   args: {
     items: z
       .record(z.string().max(50000))
-      .describe("Objeto chave-valor para definir no localStorage (ex: { 'token': 'abc', 'theme': 'dark' })"),
+      .describe("Objeto chave-valor para set no localStorage (ex: { 'token': 'abc', 'theme': 'dark' })"),
     url: z
       .string().max(5000)
       .optional()
       .describe(
-        "URL para navegar primeiro (necessário para definir localStorage de um domínio específico)",
+        "URL para navigate primeiro (necessário para set localStorage de um domínio específico)",
       ),
   },
   async execute({ items, url }: { items: Record<string, string>; url?: string }) {

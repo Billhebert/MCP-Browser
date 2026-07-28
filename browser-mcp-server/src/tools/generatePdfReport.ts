@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -21,10 +21,9 @@ function scoreLabel(score: number): string {
 
 export const generatePdfReportTool: ToolDefinition = {
   name: "generate_pdf_report",
-  description:
-    "Gerar relatório premium em HTML estilizado (pronto para impressão/PDF) com branding corporativo. Aceita dados de qualquer auditoria e produz relatório com logo, gráfico de score, issues por severidade, e recomendações. Pode ser salvo como PDF via browser.",
+  description: "Generate a styled PDF report from audit data.",
   args: {
-    data: z.string().max(50000).describe("JSON string com dados da auditoria (output de analyze_seo, check_contrast, check_a11y, etc.)"),
+    data: z.string().max(50000).describe("JSON string with dados da auditoria (output de analyze_seo, check_contrast, check_a11y, etc.)"),
     brand: z.string().max(50000).optional().describe("JSON com branding: {\"logo\":\"data:image/...\",\"company\":\"ACME Inc\",\"colors\":{\"primary\":\"#1e40af\"}}"),
   },
   async execute(args: { data: string; brand?: string }) {

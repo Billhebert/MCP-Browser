@@ -1,10 +1,9 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const validateJsonLdTool: ToolDefinition = {
   name: "validate_json_ld",
-  description:
-    "Extrair e validar dados estruturados JSON-LD da página atual. Verifica conformidade com schema.org, tipos obrigatórios, propriedades mínimas, e erros de sintaxe JSON.",
+  description: "Extract and validate JSON-LD structured data.",
   args: {},
   async execute() {
     const page = await getPage();
@@ -65,8 +64,8 @@ export const validateJsonLdTool: ToolDefinition = {
       if (item.props.length < 3) {
         issues.push({
           type: "json-ld", severity: "low",
-          message: `JSON-LD #${item.index} (${item.type}) tem apenas ${item.props.length} propriedades`,
-          details: "Considere adicionar mais propriedades para melhorar o rich snippet",
+          message: `JSON-LD #${item.index} (${item.type}) tem only ${item.props.length} propriedades`,
+          details: "Considere add mais propriedades para melhorar o rich snippet",
         });
       }
     }

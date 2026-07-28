@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 const FUZZ_VALUES: Array<{ label: string; value: string }> = [
@@ -17,10 +17,9 @@ const FUZZ_VALUES: Array<{ label: string; value: string }> = [
 
 export const fuzzFormTool: ToolDefinition = {
   name: "fuzz_form",
-  description:
-    "Testar formulários com valores extremos (XSS, SQL injection, strings longas, caracteres especiais, unicode, etc). Preenche cada campo com cada valor, verifica se a página quebra ou mostra erros. Não submete formulários.",
+  description: "Fuzz test form inputs with malicious payloads.",
   args: {
-    formSelector: z.string().max(2000).optional().describe("Seletor CSS do formulário a testar (padrão: primeiro form da página)"),
+    formSelector: z.string().max(2000).optional().describe("CSS selector do formulário a test (default: first form da page)"),
   },
   async execute(args: { formSelector?: string }) {
     const page = await getPage();

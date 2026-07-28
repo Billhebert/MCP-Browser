@@ -1,11 +1,10 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage, getNetworkLogs } from "../browser.js";
 import { isSafeUrl } from "../corporate/ssrf.js";
 
 export const checkSslTool: ToolDefinition = {
   name: "check_ssl",
-  description:
-    "Verificar certificado SSL/TLS da página atual. Analisa validade, algoritmo, e informações do certificado via response headers e timing de conexão segura. Detecta HTTPS incorreto e problemas de mixed content.",
+  description: "Verify SSL certificate: validity, issuer, protocols.",
   args: {},
   async execute() {
     const page = await getPage();

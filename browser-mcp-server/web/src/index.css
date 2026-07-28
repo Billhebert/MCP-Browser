@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@custom-variant light (&:where(.light, .light *));
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(75, 85, 99, 0.5);
+  border-radius: 2px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(75, 85, 99, 0.7);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  @apply bg-gray-950 text-gray-100;
+}
+
+.light body,
+.light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f3f4f6;
+  --bg-tertiary: #e5e7eb;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --border-color: #e5e7eb;
+}
+
+.light .bg-gray-950 { background-color: var(--bg-primary) !important; }
+.light .bg-gray-900 { background-color: var(--bg-secondary) !important; }
+.light .bg-gray-900\/60 { background-color: color-mix(in srgb, var(--bg-secondary) 60%, transparent) !important; }
+.light .bg-gray-900\/80 { background-color: color-mix(in srgb, var(--bg-secondary) 80%, transparent) !important; }
+.light .bg-gray-800 { background-color: var(--bg-tertiary) !important; }
+.light .bg-gray-800\/50 { background-color: color-mix(in srgb, var(--bg-tertiary) 50%, transparent) !important; }
+.light .bg-gray-800\/40 { background-color: color-mix(in srgb, var(--bg-tertiary) 40%, transparent) !important; }
+.light .bg-gray-950\/90 { background-color: color-mix(in srgb, var(--bg-primary) 90%, transparent) !important; }
+.light .border-gray-800 { border-color: var(--border-color) !important; }
+.light .border-gray-800\/50 { border-color: color-mix(in srgb, var(--border-color) 50%, transparent) !important; }
+.light .text-gray-100 { color: var(--text-primary) !important; }
+.light .text-gray-200 { color: var(--text-primary) !important; }
+.light .text-gray-300 { color: #374151 !important; }
+.light .text-gray-400 { color: var(--text-secondary) !important; }
+.light .text-gray-500 { color: #9ca3af !important; }
+.light .text-gray-600 { color: #9ca3af !important; }
+.light .from-white { --tw-gradient-from: #111827 !important; }
+.light .to-gray-400 { --tw-gradient-to: #6b7280 !important; }

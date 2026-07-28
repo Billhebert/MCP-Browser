@@ -1,10 +1,9 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage, getNetworkLogs, getConsoleLogs, getPerformanceMarks, getPageLoadTimeout } from "../browser.js";
 
 export const getPerformanceTool: ToolDefinition = {
   name: "get_performance",
-  description:
-    "Obter métricas de performance da página atual: tempo de carregamento, quantidade de requisições, console errors, memória (se disponível), e timing marks.",
+  description: "Get performance metrics: paint timing, navigation, memory.",
   args: {},
   async execute() {
     const page = await getPage();
@@ -31,7 +30,7 @@ export const getPerformanceTool: ToolDefinition = {
           : null,
       };
     }).catch(() => ({
-      error: "Não foi possível obter métricas (página pode estar em domínio diferente)",
+      error: "Não foi possível get métricas (página pode estar em domínio diferente)",
     }));
 
     const pageTitle = await page.title().catch(() => "?");

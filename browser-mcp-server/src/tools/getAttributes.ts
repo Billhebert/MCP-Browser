@@ -1,13 +1,12 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const getAttributesTool: ToolDefinition = {
   name: "get_attributes",
-  description:
-    "Obter todos os atributos de um elemento (id, class, aria-label, role, href, src, etc). Útil para descobrir seletores precisos.",
+  description: "Get all attributes of an element by CSS selector.",
   args: {
-    selector: z.string().max(2000).describe("Seletor CSS do elemento"),
+    selector: z.string().max(2000).describe("CSS selector do element"),
   },
   async execute({ selector }: { selector: string }) {
     const page = await getPage();
@@ -18,7 +17,7 @@ export const getAttributesTool: ToolDefinition = {
 
     if (count === 0) {
       return {
-        content: [{ type: "text", text: `Elemento não encontrado: ${selector}` }],
+        content: [{ type: "text", text: `Element não encontrado: ${selector}` }],
         isError: true,
       };
     }

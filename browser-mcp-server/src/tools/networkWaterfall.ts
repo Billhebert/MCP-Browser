@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage, getNetworkLogs, clearNetworkLogs } from "../browser.js";
 
 function categorizeDomain(domain: string): string {
@@ -15,10 +15,9 @@ function categorizeDomain(domain: string): string {
 
 export const networkWaterfallTool: ToolDefinition = {
   name: "network_waterfall",
-  description:
-    "Analisar requisições de rede capturadas na página atual. Gera waterfall, análise de domínios terceiros, compressão, cache, render-blocking resources. Útil para diagnosticar performance.",
+  description: "Analyze network request timing waterfall.",
   args: {
-    slowThreshold: z.string().max(100).optional().describe("Threshold TTFB em ms para considerar lento (padrão: 1000)"),
+    slowThreshold: z.string().max(100).optional().describe("Threshold TTFB em ms para considerar lento (default: 1000)"),
     clear: z.string().max(5000).optional().describe("Se 'true', limpa o log de rede após análise"),
   },
   async execute(args: { slowThreshold?: string; clear?: string }) {

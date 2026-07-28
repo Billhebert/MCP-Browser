@@ -1,9 +1,9 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const refreshTool: ToolDefinition = {
   name: "refresh",
-  description: "Recarregar a página atual.",
+  description: "Refresh the current page.",
   args: {},
   async execute() {
     const page = await getPage();

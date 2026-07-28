@@ -1,4 +1,4 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getNetworkLogs } from "../browser.js";
 
 const KNOWN_THIRD_PARTIES: Array<{ domain: string; category: string; name: string }> = [
@@ -40,8 +40,7 @@ const KNOWN_THIRD_PARTIES: Array<{ domain: string; category: string; name: strin
 
 export const checkThirdPartiesTool: ToolDefinition = {
   name: "check_third_parties",
-  description:
-    "Analisar requisições de terceiros na página. Classifica por categoria (analytics, ads, social, CDN, fonts, etc), mede impacto em número de requests e bytes transferidos.",
+  description: "Identify third-party domains and services loaded.",
   args: {},
   async execute() {
     const networkLogs = getNetworkLogs();

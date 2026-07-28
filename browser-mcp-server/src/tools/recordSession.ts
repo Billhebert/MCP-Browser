@@ -1,14 +1,13 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage, getContext } from "../browser.js";
 
 export const recordSessionTool: ToolDefinition = {
   name: "record_session",
-  description:
-    "Gravar uma sessão de navegação usando Playwright Tracing. Gera um arquivo .zip com trace que pode ser visualizado em https://trace.playwright.dev/. Útil para debug de fluxos complexos.",
+  description: "Record user interactions as a Playwright script.",
   args: {
     action: z.string().max(100).describe("Ação: 'start' (inicia gravação), 'stop' (finaliza e retorna link), 'status' (verifica se está gravando)"),
-    name: z.string().max(500).optional().describe("Nome do snapshot (opcional, usado com stop)"),
+    name: z.string().max(500).optional().describe("Name do snapshot (optional, usado with stop)"),
   },
   async execute(args: { action: string; name?: string }) {
     const ctx = await getContext();

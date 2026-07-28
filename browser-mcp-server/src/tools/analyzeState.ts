@@ -1,10 +1,9 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const analyzeStateTool: ToolDefinition = {
   name: "analyze_state",
-  description:
-    "Inspecionar estado interno de aplicações frontend (React, Vue, Angular). Tenta acessar devtools hooks, __NEXT_DATA__, __NUXT__, Vue reativity, e expõe dados serializados do componente raiz.",
+  description: "Inspect page state: form values, checkbox states, storage.",
   args: {},
   async execute() {
     const page = await getPage();

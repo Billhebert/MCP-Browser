@@ -1,10 +1,9 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const analyzeCssTool: ToolDefinition = {
   name: "analyze_css",
-  description:
-    "Analisar CSS da página atual: custom properties declaradas, tokens usados vs não usados, fontes carregadas vs declaradas, cores hardcoded, seletores não utilizados, alta especificidade. Útil para auditoria de design system.",
+  description: "Analyze CSS: selectors, colors, font-sizes, media queries.",
   args: {},
   async execute() {
     const page = await getPage();

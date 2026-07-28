@@ -1,12 +1,12 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const executeJsTool: ToolDefinition = {
   name: "execute_js",
-  description: "Executar JavaScript arbitrário na página atual. Use com cuidado.",
+  description: "Execute arbitrary JavaScript in the browser context.",
   args: {
-    script: z.string().max(50000).describe("Código JavaScript para executar na página"),
+    script: z.string().max(50000).describe("Code: JavaScript para executar na page"),
   },
   async execute({ script }: { script: string }) {
     console.error(`⚡ Executando JavaScript na página...`);

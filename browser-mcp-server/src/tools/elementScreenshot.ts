@@ -1,24 +1,23 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const elementScreenshotTool: ToolDefinition = {
   name: "element_screenshot",
-  description:
-    "Capturar screenshot de UM elemento específico da página (não a página toda). Útil para ver detalhes de um botão, modal, campo, etc.",
+  description: "Capture a screenshot of a specific element.",
   args: {
-    selector: z.string().max(2000).describe("Seletor CSS do elemento para capturar"),
+    selector: z.string().max(2000).describe("CSS selector do element para capture"),
   },
   async execute({ selector }: { selector: string }) {
     const page = await getPage();
-    console.error(`📸 Capturando screenshot do elemento: ${selector}`);
+    console.error(`📸 Taking screenshot do element: ${selector}`);
 
     const locator = page.locator(selector).first();
     const count = await page.locator(selector).count();
 
     if (count === 0) {
       return {
-        content: [{ type: "text", text: `Elemento não encontrado: ${selector}` }],
+        content: [{ type: "text", text: `Element não encontrado: ${selector}` }],
         isError: true,
       };
     }
@@ -26,13 +25,13 @@ export const elementScreenshotTool: ToolDefinition = {
     const screenshot = await locator.screenshot({ type: "png" });
     const base64 = screenshot.toString("base64");
 
-    console.error(`✅ Screenshot do elemento: ${selector} (${base64.length} bytes)`);
+    console.error(`✅ Screenshot do element: ${selector} (${base64.length} bytes)`);
     return {
       content: [
         { type: "image", data: base64, mimeType: "image/png" },
         {
           type: "text",
-          text: `Screenshot do elemento: ${selector}`,
+          text: `Screenshot do element: ${selector}`,
         },
       ],
     };

@@ -1,7 +1,8 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getContext } from "../browser.js";
 import { isSafeUrl } from "../corporate/ssrf.js";
+import { broadcast } from "../http/wsHandler.js";
 import { analyzeSeoTool } from "./analyzeSeo.js";
 import { checkA11yTool } from "./checkA11y.js";
 import { checkSecurityTool } from "./checkSecurity.js";
@@ -546,7 +547,7 @@ function computeDashboard(
   const recommendations: string[] = [];
   for (const p of patterns) {
     if (p.affectedCount >= 2 && p.severity !== "info") {
-      recommendations.push(`${p.severity === "high" ? "🔴" : "🟡"} ${p.message} (${p.affectedCount}/${p.totalPages} páginas, ${p.percentage}%)`);
+      recommendations.push(`${p.severity === "high" ? "🔴" : "🟡"} ${p.message} (${p.affectedCount}/${p.totalPages} pages, ${p.percentage}%)`);
     }
   }
 
@@ -569,18 +570,17 @@ function computeDashboard(
 
 export const fullSiteAuditTool: ToolDefinition = {
   name: "full_site_audit",
-  description:
-    "Auditoria completa de site igual ao Unlighthouse. Descobre URLs via sitemap.xml + crawling, executa todas as ferramentas de auditoria (SEO, a11y, performance, segurança, privacidade, conteúdo) em cada página, e consolida resultados em um dashboard com scores, padrões cross-page, e recomendações.",
+  description: "Unlighthouse-style full site audit: crawl all pages, run all tools, consolidate dashboard.",
   args: {
-    url: z.string().max(5000).optional().describe("URL inicial para começar (padrão: URL atual do navegador)"),
-    maxPages: z.number().optional().describe("Máximo de páginas para auditar (padrão: 10)"),
-    maxDepth: z.number().optional().describe("Profundidade máxima de crawl (padrão: 2)"),
-    exclude: z.string().max(100).optional().describe("Padrões de URL para excluir (separados por vírgula)"),
-    include: z.string().max(100).optional().describe("Padrões de URL para incluir (separados por vírgula)"),
+    url: z.string().max(5000).optional().describe("URL inicial para witheçar (default: URL current do browser)"),
+    maxPages: z.number().optional().describe("Máximo de pages para auditar (default: 10)"),
+    maxDepth: z.number().optional().describe("depth máxima de crawl (default: 2)"),
+    exclude: z.string().max(100).optional().describe("Padrões de URL para exclude (separated por vírgula)"),
+    include: z.string().max(100).optional().describe("Padrões de URL para include (separated por vírgula)"),
     categories: z.string().max(50000).optional().describe("Categorias para auditar: 'seo,a11y,performance,security,privacy,content' ou 'all' (padrão: 'all')"),
-    concurrency: z.number().optional().describe("Número de páginas auditadas em paralelo (padrão: 3)"),
-    thresholds: z.string().max(50000).optional().describe("JSON com thresholds de score por categoria. Ex: {\"seo\":70,\"a11y\":80}"),
-    noSitemap: z.boolean().optional().describe("Se true, pula sitemap.xml (padrão: false)"),
+    concurrency: z.number().optional().describe("Número de pages auditadas em paralelo (default: 3)"),
+    thresholds: z.string().max(50000).optional().describe("JSON com thresholds de score por categoria. ex: {\"seo\":70,\"a11y\":80}"),
+    noSitemap: z.boolean().optional().describe("If true, pula sitemap.xml (default: false)"),
   },
   async execute(args: {
     url?: string;
@@ -622,6 +622,7 @@ export const fullSiteAuditTool: ToolDefinition = {
 
     // Phase 1: Discover URLs
     console.error(`  Descobrindo URLs...`);
+    broadcast("audit:status", { phase: "discovering", message: "Descobrindo URLs via sitemap + crawl" });
     const urls = await discoverUrls(startUrl, maxPages, maxDepth, exclude, include, useSitemap);
     if (urls.length === 0) {
       return {
@@ -630,16 +631,36 @@ export const fullSiteAuditTool: ToolDefinition = {
       };
     }
     console.error(`  ✅ ${urls.length} URLs descobertas`);
+    broadcast("audit:discovered", { urls, count: urls.length });
 
     // Phase 2: Audit each page with concurrency
     const overallStart = Date.now();
     const pageResults: PageAuditResult[] = [];
+    let completedCount = 0;
+
+    broadcast("audit:status", { phase: "scanning", message: `Auditando ${urls.length} pages` });
 
     // Use chunks for concurrency control
     for (let i = 0; i < urls.length; i += concurrency) {
       const chunk = urls.slice(i, i + concurrency);
       const chunkResults = await Promise.all(
-        chunk.map((url) => auditSinglePage(ctx, url, selectedTools)),
+        chunk.map(async (url) => {
+          broadcast("audit:page-start", { url, index: completedCount, total: urls.length });
+          const result = await auditSinglePage(ctx, url, selectedTools);
+          const sc = result.toolResults.find((t) => t.score !== null)?.score ?? null;
+          completedCount++;
+          broadcast("audit:page-complete", {
+            url,
+            title: result.title,
+            status: result.status,
+            score: sc,
+            toolCount: result.toolResults.length,
+            issueCount: result.toolResults.reduce((s, t) => s + (t.issues?.length || 0), 0),
+            loadTimeMs: result.loadTimeMs,
+          });
+          broadcast("audit:progress", { completed: completedCount, total: urls.length, elapsed: Date.now() - overallStart });
+          return result;
+        }),
       );
       pageResults.push(...chunkResults);
       for (const r of chunkResults) {
@@ -652,6 +673,7 @@ export const fullSiteAuditTool: ToolDefinition = {
     const scanDurationMs = Date.now() - overallStart;
 
     // Phase 3: Cross-page pattern analysis
+    broadcast("audit:status", { phase: "analyzing", message: "Analisando padrões cross-page" });
     const patterns = analyzeCrossPagePatterns(pageResults);
 
     // Phase 4: Compute dashboard
@@ -659,10 +681,12 @@ export const fullSiteAuditTool: ToolDefinition = {
     (dashboard.site as any).scanDurationMs = scanDurationMs;
     (dashboard.site as any).crawlSource = useSitemap ? "sitemap+live" : "live";
 
-    console.error(`✅ Full Site Audit concluído: ${urls.length} páginas em ${(scanDurationMs / 1000).toFixed(1)}s`);
+    console.error(`✅ Full Site Audit concluído: ${urls.length} pages em ${(scanDurationMs / 1000).toFixed(1)}s`);
     console.error(`  Score geral: ${dashboard.site.overallScore}`);
     console.error(`  Issues: ${dashboard.site.totalIssuesFound}`);
     console.error(`  Padrões cross-page: ${patterns.length}`);
+
+    broadcast("audit:complete", { dashboard });
 
     return {
       content: [{

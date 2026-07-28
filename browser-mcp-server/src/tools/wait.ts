@@ -1,20 +1,19 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 const waitTypes = ["load", "selector", "url", "timeout"] as const;
 
 export const waitTool: ToolDefinition = {
   name: "wait",
-  description:
-    "Aguardar por um estado específico da página: load (carregamento), selector (elemento aparecer), url (URL mudar) ou timeout (tempo em ms).",
+  description: "Wait for a specified time in milliseconds.",
   args: {
     type: z.enum(waitTypes).describe("Tipo de espera: 'load', 'selector', 'url', 'timeout'"),
     value: z
       .string().max(5000)
       .optional()
       .describe(
-        "Valor para a espera: seletor CSS para 'selector', URL para 'url', ms para 'timeout'. Obrigatório exceto para 'load'.",
+        "Valor para a espera: CSS selector para 'selector', URL para 'url', ms para 'timeout'. Obrigatório exceto para 'load'.",
       ),
   },
   async execute({

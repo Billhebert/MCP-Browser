@@ -1,10 +1,9 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const checkCookiesConsentTool: ToolDefinition = {
   name: "check_cookies_consent",
-  description:
-    "Auditar consentimento de cookies na página atual. Detecta presença de banner/notificação de cookies, verifica se há mecanismo de recusa, e analisa conformidade básica com LGPD/GDPR.",
+  description: "Audit LGPD/GDPR cookie consent implementation.",
   args: {},
   async execute() {
     const page = await getPage();
@@ -53,7 +52,7 @@ export const checkCookiesConsentTool: ToolDefinition = {
       issues.push({
         type: "cookies-consent", severity: "medium",
         message: "Nenhuma menção a cookies ou política de privacidade encontrada",
-        details: "Sites com público brasileiro devem seguir a LGPD. Considere adicionar um banner de consentimento.",
+        details: "Sites com público brasileiro devem seguir a LGPD. Considere add um banner de consentimento.",
       });
     } else if (result.hasCookieBanner && !result.hasRejectButton) {
       issues.push({

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 interface SnapshotData {
@@ -20,14 +20,14 @@ export function getSnapshots() {
 export const saveSnapshotTool: ToolDefinition = {
   name: "save_snapshot",
   description:
-    "Salvar um snapshot (foto) do estado atual da página: URL, título, texto visível e screenshot. O snapshot fica armazenado em memória.",
+    "Salvar um snapshot (foto) do estado current da página: URL, título, texto visível e screenshot. O snapshot fica armazenado em memória.",
   args: {
-    name: z.string().max(500).optional().describe("Nome opcional para identificar o snapshot"),
+    name: z.string().max(500).optional().describe("Name optional para identificar o snapshot"),
   },
   async execute({ name }: { name?: string }) {
     const page = await getPage();
     const snapshotName = name || `snapshot-${Date.now()}`;
-    console.error(`📸 Salvando snapshot: ${snapshotName}`);
+    console.error(`📸 Saving snapshot: ${snapshotName}`);
 
     const data: SnapshotData = {
       name: snapshotName,
@@ -82,7 +82,7 @@ export const restoreSnapshotTool: ToolDefinition = {
   description:
     "Restaurar um snapshot salvo: navega para a URL, verifica se o título e texto conferem, e retorna o screenshot para comparação visual.",
   args: {
-    name: z.string().max(500).describe("Nome do snapshot salvo anteriormente"),
+    name: z.string().max(500).describe("Name do snapshot salvo anteriormente"),
   },
   async execute({ name }: { name: string }) {
     const data = snapshotsStore.get(name);

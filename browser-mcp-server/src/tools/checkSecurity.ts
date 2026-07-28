@@ -1,4 +1,4 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage, getNetworkLogs } from "../browser.js";
 
 function addIssue(
@@ -15,8 +15,7 @@ function addIssue(
 
 export const checkSecurityTool: ToolDefinition = {
   name: "check_security",
-  description:
-    "Auditar segurança da página atual: headers HTTP (CSP, HSTS, XFO, XCTO), cookies (Secure/HttpOnly/SameSite), mixed content, CORS, SRI, OWASP input validation. Retorna score 0-100 com issues detalhadas.",
+  description: "Audit security: headers, cookies, mixed content, CORS, SRI, OWASP. Returns score 0-100.",
   args: {},
   async execute() {
     const page = await getPage();

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage, getContext } from "../browser.js";
 
 const DEVICE_PRESETS: Record<string, { width: number; height: number; userAgent: string; touch: boolean }> = {
@@ -16,13 +16,12 @@ const DEVICE_PRESETS: Record<string, { width: number; height: number; userAgent:
 
 export const emulateDeviceTool: ToolDefinition = {
   name: "emulate_device",
-  description:
-    "Emular um dispositivo específico: ajusta viewport, user agent e touch support. Presets: iphone-14, iphone-se, pixel-7, samsung-s23, ipad-air, ipad-pro, desktop-1080, desktop-1440, macbook-pro. Ou especifique valores customizados.",
+  description: "Emulate a mobile device: viewport, user agent, touch.",
   args: {
-    device: z.string().max(100).optional().describe("Nome do preset: iphone-14, iphone-se, pixel-7, samsung-s23, ipad-air, ipad-pro, desktop-1080, desktop-1440, macbook-pro"),
-    width: z.string().max(100).optional().describe("Largura em px (usado com height se device não especificado)"),
+    device: z.string().max(100).optional().describe("Name do preset: iphone-14, iphone-se, pixel-7, samsung-s23, ipad-air, ipad-pro, desktop-1080, desktop-1440, macbook-pro"),
+    width: z.string().max(100).optional().describe("Largura em px (usado with height se device not especificado)"),
     height: z.string().max(100).optional().describe("Altura em px"),
-    userAgent: z.string().max(100).optional().describe("User agent string customizado"),
+    userAgent: z.string().max(100).optional().describe("User agent string custom"),
   },
   async execute(args: { device?: string; width?: string; height?: string; userAgent?: string }) {
     const page = await getPage();

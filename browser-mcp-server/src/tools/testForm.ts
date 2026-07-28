@@ -1,13 +1,12 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const testFormTool: ToolDefinition = {
   name: "test_form",
-  description:
-    "Auditar e testar formulários na página atual. Detecta campos obrigatórios, validação HTML5 (required, pattern, minlength, maxlength, type), estados de erro, e testa submissão sem enviar (preventDefault).",
+  description: "Test form validation: required fields, email, number range, maxlength.",
   args: {
-    action: z.string().max(100).optional().describe("Ação: 'audit' (padrão, apenas inspeciona), 'test' (tenta submeter com preventDefault)"),
+    action: z.string().max(100).optional().describe("Ação: 'audit' (padrão, only inspeciona), 'test' (tenta submeter com preventDefault)"),
   },
   async execute(args: { action?: string }) {
     const page = await getPage();

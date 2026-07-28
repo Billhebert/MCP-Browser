@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 import { readFileSync } from "fs";
 import { createRequire } from "module";
@@ -23,23 +23,13 @@ const SEVERITY_WEIGHTS: Record<string, number> = {
 
 export const checkA11yTool: ToolDefinition = {
   name: "check_a11y",
-  description:
-    "Auditar acessibilidade da página atual usando axe-core WCAG 2.2 AA. Verifica violações, heading order, landmarks, focus indicators, keyboard traps. Retorna score 0-100.",
+  description: "Audit accessibility with axe-core WCAG 2.2. Checks violations, landmarks, focus, keyboard.",
   args: {
-    wcagLevel: z
-      .string().max(5000)
-      .optional()
-      .describe("Nível WCAG: 'A', 'AA' (padrão), 'AAA'"),
-    failOnSeverity: z
-      .string().max(5000)
-      .optional()
-      .describe("Severidade mínima para falha: 'low', 'moderate', 'serious', 'critical' (padrão: 'moderate')"),
-    ignoreRules: z
-      .string().max(5000)
-      .optional()
-      .describe("Lista de regras para ignorar (separadas por vírgula)"),
+    wcagLevel: z.enum(["A", "AA", "AAA"]).optional().describe("WCAG level. Default: AA"),
+    failOnSeverity: z.enum(["low", "moderate", "serious", "critical"]).optional().describe("Minimum severity to fail. Default: moderate"),
+    ignoreRules: z.string().max(5000).optional().describe("Comma-separated rule IDs to ignore"),
   },
-  async execute(args: { wcagLevel?: string; failOnSeverity?: string; ignoreRules?: string }) {
+  async execute(args: { wcagLevel?: "A" | "AA" | "AAA"; failOnSeverity?: "low" | "moderate" | "serious" | "critical"; ignoreRules?: string }) {
     const page = await getPage();
     const wcagLevel = args.wcagLevel || "AA";
     const failOnSeverity = args.failOnSeverity || "moderate";
@@ -73,24 +63,18 @@ export const checkA11yTool: ToolDefinition = {
           ? ["wcag2a", "wcag21a"]
           : ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
-    const axeResults: {
-      violations: Array<{
-        id: string;
-        impact: string;
-        description: string;
-        help: string;
-        helpUrl: string;
-        nodes: Array<{ html: string; target: string[]; failureSummary?: string }>;
-      }>;
-      passes: Array<{ id: string }>;
-      incomplete: Array<{ id: string }>;
-    } = await page.evaluate((tagList: string[]) => {
-      return (window as any).axe.run(document, {
-        runOnly: { type: "tag", values: tagList },
-        resultTypes: ["violations", "passes", "incomplete"],
-        reporter: "v2",
-      });
-    }, tags);
+    let axeResults: any = { violations: [], passes: [], incomplete: [] };
+    try {
+      axeResults = await page.evaluate((tagList: string[]) => {
+        return (window as any).axe.run(document, {
+          runOnly: { type: "tag", values: tagList },
+          resultTypes: ["violations", "passes", "incomplete"],
+          reporter: "v2",
+        });
+      }, tags);
+    } catch (err) {
+      console.error(`Axe-core run failed:`, (err as Error).message);
+    }
 
     const allViolations: Array<{
       id: string;
@@ -113,30 +97,27 @@ export const checkA11yTool: ToolDefinition = {
       });
     }
 
-    const customChecks = await page.evaluate(() => {
-      const extra: Array<{
-        id: string;
-        impact: string;
-        description: string;
-        help: string;
-        helpUrl: string;
-        elements: number;
-      }> = [];
+    let customChecks: any[] = [];
+    try {
+      customChecks = await page.evaluate(() => {
+        const extra: Array<{
+          id: string; impact: string; description: string; help: string; helpUrl: string; elements: number;
+        }> = [];
 
-      const headings = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6")) as HTMLElement[];
-      if (headings.length > 0) {
-        let prevLevel = parseInt(headings[0]!.tagName[1]!, 10);
-        if (prevLevel !== 1) {
-          extra.push({
-            id: "heading-order-not-first",
-            impact: "moderate",
-            description: "Página não começa com h1",
-            help: "Inicie a hierarquia de headings com h1",
-            helpUrl: "https://www.w3.org/WAI/tutorials/page-structure/headings/",
-            elements: 1,
-          });
-        }
-        for (let i = 1; i < headings.length; i++) {
+        const headings = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6")) as HTMLElement[];
+        if (headings.length > 0) {
+          let prevLevel = parseInt(headings[0]!.tagName[1]!, 10);
+          if (prevLevel !== 1) {
+            extra.push({
+              id: "heading-order-not-first",
+              impact: "moderate",
+              description: "Audit accessibility with axe-core WCAG 2.2. Checks violations, landmarks, focus, keyboard.",
+              help: "Start heading hierarchy with h1",
+              helpUrl: "https://www.w3.org/WAI/tutorials/page-structure/headings/",
+              elements: 1,
+            });
+          }
+          for (let i = 1; i < headings.length; i++) {
           const level = parseInt(headings[i]!.tagName[1]!, 10);
           if (level > prevLevel + 1) {
             extra.push({
@@ -158,7 +139,7 @@ export const checkA11yTool: ToolDefinition = {
         extra.push({
           id: "landmark-no-main",
           impact: "serious",
-          description: "Página não contém landmark main",
+          description: "Audit accessibility with axe-core WCAG 2.2. Checks violations, landmarks, focus, keyboard.",
           help: "Adicione <main> ou role='main'",
           helpUrl: "https://www.w3.org/WAI/tutorials/page-structure/regions/",
           elements: 1,
@@ -184,8 +165,8 @@ export const checkA11yTool: ToolDefinition = {
           extra.push({
             id: "focus-indicator-missing",
             impact: "serious",
-            description: `Elemento ${sel} sem indicador de foco visível`,
-            help: "Garanta que elementos interativos tenham outline, box-shadow ou border visível",
+            description: `element ${sel} sem indicador de foco visível`,
+            help: "Garanta que elements interativos tenham outline, box-shadow ou border visível",
             helpUrl: "https://www.w3.org/WAI/WCAG21/Understanding/focus-visible.html",
             elements: 1,
           });
@@ -195,6 +176,9 @@ export const checkA11yTool: ToolDefinition = {
 
       return extra;
     });
+    } catch (err) {
+      console.error(`Custom checks evaluate failed:`, (err as Error).message);
+    }
 
     for (const check of customChecks) {
       if (!allViolations.some((v) => v.id === check.id)) {
@@ -220,7 +204,7 @@ export const checkA11yTool: ToolDefinition = {
       total: (axeResults.passes?.length ?? 0) + allViolations.length + (axeResults.incomplete?.length ?? 0),
     };
 
-    console.error(`✅ A11y: score ${score} (${allViolations.length} violações)`);
+    console.error(`✅ A11y: score ${score} (${allViolations.length} violations)`);
     return {
       content: [
         {

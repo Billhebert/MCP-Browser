@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 const NETWORK_PRESETS: Record<string, { offline: boolean; latency: number; download: number; upload: number }> = {
@@ -15,11 +15,10 @@ const NETWORK_PRESETS: Record<string, { offline: boolean; latency: number; downl
 
 export const setNetworkTool: ToolDefinition = {
   name: "set_network",
-  description:
-    "Simular condições de rede na pagina atual. Presets: slow-3g, regular-3g, fast-3g, slow-4g, regular-4g, fast-4g, offline, wifi. Ou especifique latência, download, upload customizados. NOTA: Usa CDP para throttling real.",
+  description: "Simulate network conditions: throttle, offline, or custom.",
   args: {
     preset: z.string().max(100).optional().describe("Preset de rede: slow-3g, regular-3g, fast-3g, slow-4g, regular-4g, fast-4g, offline, wifi"),
-    latency: z.string().max(100).optional().describe("Latência em ms (usado com download/upload se preset não especificado)"),
+    latency: z.string().max(100).optional().describe("Latência em ms (usado with download/upload se preset not especificado)"),
     download: z.string().max(100).optional().describe("Download em kbps"),
     upload: z.string().max(100).optional().describe("Upload em kbps"),
   },

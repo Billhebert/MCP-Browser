@@ -1,11 +1,10 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const setColorSchemeTool: ToolDefinition = {
   name: "set_color_scheme",
-  description:
-    "Forçar o esquema de cores do navegador: 'dark' (modo escuro) ou 'light' (modo claro). Afeta media query prefers-color-scheme.",
+  description: "Force color scheme: light, dark, or no-preference.",
   args: {
     scheme: z.enum(["dark", "light"]).describe("Esquema de cores: 'dark' ou 'light'"),
   },

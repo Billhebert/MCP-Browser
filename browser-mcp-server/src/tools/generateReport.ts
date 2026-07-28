@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -7,10 +7,9 @@ function escapeHtml(s: string): string {
 
 export const generateReportTool: ToolDefinition = {
   name: "generate_report",
-  description:
-    "Gerar relatório HTML/JUnit/CSV/JSON a partir de dados fornecidos. Útil para documentar resultados de análises (SEO, a11y, security, etc.) em formato padronizado.",
+  description: "Generate a consolidated report from audit data.",
   args: {
-    data: z.string().max(50000).describe("Dados em JSON string com os resultados das análises"),
+    data: z.string().max(50000).describe("Dados em JSON string with os resultados das análises"),
     format: z.string().max(100).optional().describe("Formato: 'html' (padrão), 'junit', 'csv', 'json'"),
     title: z.string().max(500).optional().describe("Título do relatório (padrão: 'QA Report')"),
   },
@@ -104,7 +103,7 @@ export const generateReportTool: ToolDefinition = {
     }
 
     if (rawData.violations) {
-      sections += `<div style="background:#0f172a;border-radius:8px;padding:16px;margin-bottom:12px"><h4 style="margin:0 0 8px;font-size:14px;color:#94a3b8">Accessibility (${rawData.violations.length} violações)</h4>${rawData.violations.map((v: any) => `<details style="margin-top:4px;padding:8px;background:#1e293b;border-radius:6px"><summary style="cursor:pointer;font-size:13px"><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;color:#fff;background:#ef4444;margin-right:6px">${(v.impact || "info").toUpperCase()}</span> ${escapeHtml(v.help || v.description)}</summary><p style="margin:8px 0 0;padding-left:16px;font-size:12px;color:#94a3b8">${escapeHtml(v.description)} (${v.elements} elements)</p></details>`).join("")}</div>`;
+      sections += `<div style="background:#0f172a;border-radius:8px;padding:16px;margin-bottom:12px"><h4 style="margin:0 0 8px;font-size:14px;color:#94a3b8">Accessibility (${rawData.violations.length} violations)</h4>${rawData.violations.map((v: any) => `<details style="margin-top:4px;padding:8px;background:#1e293b;border-radius:6px"><summary style="cursor:pointer;font-size:13px"><span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;color:#fff;background:#ef4444;margin-right:6px">${(v.impact || "info").toUpperCase()}</span> ${escapeHtml(v.help || v.description)}</summary><p style="margin:8px 0 0;padding-left:16px;font-size:12px;color:#94a3b8">${escapeHtml(v.description)} (${v.elements} elements)</p></details>`).join("")}</div>`;
     }
 
     if (rawData.issues && !rawData.seo) {

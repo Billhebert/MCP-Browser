@@ -1,8 +1,8 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 const PERSONAL_DATA_TYPES = [
-  "name", "nome", "email", "e-mail", "phone", "telefone", "celular", "address", "endereço",
+  "name", "name", "email", "e-mail", "phone", "telefone", "celular", "address", "endereço",
   "cpf", "rg", "document", "documento", "birth", "nascimento", "password", "senha",
   "credit", "cartão", "card", "payment", "pagamento", "cep", "zip", "cidade", "city",
   "estado", "state", "sex", "gênero", "gender", "profession", "profissão", "company", "empresa",
@@ -10,8 +10,7 @@ const PERSONAL_DATA_TYPES = [
 
 export const checkPrivacyFormsTool: ToolDefinition = {
   name: "check_privacy_forms",
-  description:
-    "Auditar formulários que coletam dados pessoais na página atual. Identifica campos de dados sensíveis (nome, email, CPF, RG, telefone, etc), verifica presença de política de privacidade próxima, e avalia conformidade básica com LGPD.",
+  description: "Audit privacy forms for compliance.",
   args: {},
   async execute() {
     const page = await getPage();
@@ -41,7 +40,7 @@ export const checkPrivacyFormsTool: ToolDefinition = {
             || input.closest("label")?.textContent?.trim()
             || input.placeholder || name;
 
-          for (const pdt of ["name", "nome", "email", "e-mail", "phone", "telefone", "celular", "address",
+          for (const pdt of ["name", "name", "email", "e-mail", "phone", "telefone", "celular", "address",
             "endereço", "cpf", "rg", "document", "nascimento", "birth", "password", "senha",
             "credit", "cartão", "card", "payment", "pagamento"]) {
             if (name.toLowerCase().includes(pdt) || labelText.toLowerCase().includes(pdt)) {

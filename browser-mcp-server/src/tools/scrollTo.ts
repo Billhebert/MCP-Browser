@@ -1,16 +1,15 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const scrollToTool: ToolDefinition = {
   name: "scroll_to",
-  description:
-    "Rolar a página até um elemento específico ou para uma posição. Útil para carregar conteúdo lazy ou tornar um elemento visível.",
+  description: "Scroll page to a specific position or element.",
   args: {
     selector: z
       .string().max(2000)
       .optional()
-      .describe("Seletor CSS do elemento para rolar até ele"),
+      .describe("CSS selector do element para rolar até ele"),
     position: z
       .enum(["top", "bottom", "center"])
       .optional()

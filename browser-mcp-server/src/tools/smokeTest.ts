@@ -1,13 +1,12 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const smokeTestTool: ToolDefinition = {
   name: "smoke_test",
-  description:
-    "Executar teste de fumaça em múltiplas URLs. Para cada URL, navega, verifica status HTTP, busca texto opcional e tira screenshot. Retorna relatório completo com pass/fail por página.",
+  description: "Run smoke tests: check essential elements and console errors.",
   args: {
-    urls: z.string().max(5000).describe("JSON array de objetos: [{\"url\":\"https://...\",\"expectedText\":\"opcional\",\"expectedStatus\":200}]"),
+    urls: z.string().max(5000).describe("JSON array de objetos: [{\"url\":\"https://...\",\"expectedText\":\"optional\",\"expectedStatus\":200}]"),
     screenshotOnFail: z.string().max(5000).optional().describe("Se 'true', captura screenshot em caso de falha"),
   },
   async execute(args: { urls: string; screenshotOnFail?: string }) {

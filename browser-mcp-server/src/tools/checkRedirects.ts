@@ -1,14 +1,13 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const checkRedirectsTool: ToolDefinition = {
   name: "check_redirects",
-  description:
-    "Mapear cadeia completa de redirects de uma URL. Segue cada redirect (301, 302, 307, 308) até o destino final e retorna o caminho completo com status codes, tempos de resposta, e recomendações de otimização.",
+  description: "Map and analyze redirect chains and loops.",
   args: {
     url: z.string().max(5000).describe("URL para rastrear redirects"),
-    maxRedirects: z.string().max(100).optional().describe("Número máximo de redirects a seguir (padrão: 10)"),
+    maxRedirects: z.string().max(100).optional().describe("Número maximum de redirects a seguir (default: 10)"),
   },
   async execute(args: { url: string; maxRedirects?: string }) {
     const page = await getPage();

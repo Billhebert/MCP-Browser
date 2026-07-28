@@ -1,11 +1,10 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getContext } from "../browser.js";
 
 export const setLocaleTool: ToolDefinition = {
   name: "set_locale",
-  description:
-    "Alterar o idioma/localidade do navegador. Afeta Accept-Language e navigator.language. Ex: 'pt-BR', 'en-US', 'es', 'fr-FR'.",
+  description: "Change browser locale for the session.",
   args: {
     locale: z.string().max(100).describe("Código do locale (ex: 'pt-BR', 'en-US', 'es', 'fr-FR')"),
   },

@@ -1,13 +1,12 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const highlightTool: ToolDefinition = {
   name: "highlight",
-  description:
-    "Destacar visualmente um elemento na página do navegador com uma borda colorida e pulsante. Útil para você ver exatamente qual elemento será clicado/preenchido.",
+  description: "Highlight elements matching a CSS selector.",
   args: {
-    selector: z.string().max(2000).describe("Seletor CSS do elemento a destacar"),
+    selector: z.string().max(2000).describe("CSS selector do element a destacar"),
     color: z
       .string().max(100)
       .optional()
@@ -16,12 +15,12 @@ export const highlightTool: ToolDefinition = {
   async execute({ selector, color }: { selector: string; color?: string }) {
     const page = await getPage();
     const borderColor = color || "red";
-    console.error(`🔦 Destacando: ${selector} (cor: ${borderColor})`);
+    console.error(`🔦 Highlighting: ${selector} (cor: ${borderColor})`);
 
     const count = await page.locator(selector).count();
     if (count === 0) {
       return {
-        content: [{ type: "text", text: `Elemento não encontrado: ${selector}` }],
+        content: [{ type: "text", text: `Element não encontrado: ${selector}` }],
         isError: true,
       };
     }
@@ -55,7 +54,7 @@ export const highlightTool: ToolDefinition = {
       { selector, borderColor },
     );
 
-    console.error(`✅ Elemento destacado: ${selector}`);
+    console.error(`✅ element destacado: ${selector}`);
     return {
       content: [
         {
@@ -64,7 +63,7 @@ export const highlightTool: ToolDefinition = {
             success: true,
             selector,
             color: borderColor,
-            message: `Elemento destacado em ${borderColor} por 10 segundos`,
+            message: `element destacado em ${borderColor} por 10 segundos`,
           }),
         },
       ],

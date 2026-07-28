@@ -1,10 +1,9 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const lighthouseAuditTool: ToolDefinition = {
   name: "lighthouse_audit",
-  description:
-    "Auditar performance da página atual usando métricas do navegador (LCP, CLS, FCP, TBT, Speed Index via Performance API). Alternativa leve ao Lighthouse — não precisa do Chrome DevTools Protocol. Coleta métricas reais da página visível.",
+  description: "Audit performance using browser APIs. Measures LCP, CLS, FCP, TBT.",
   args: {},
   async execute() {
     const page = await getPage();

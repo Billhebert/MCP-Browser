@@ -1,26 +1,25 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const getTextTool: ToolDefinition = {
   name: "get_text",
-  description:
-    "Extrair o texto visível da página toda ou de um elemento específico. Retorna até 5000 caracteres.",
+  description: "Extract visible text from an element using CSS selector.",
   args: {
     selector: z
       .string().max(2000)
       .optional()
-      .describe("Seletor CSS opcional. Se omitido, extrai o texto da página inteira."),
+      .describe("CSS selector optional. Se omitido, extrai o texto da page inteira."),
   },
   async execute({ selector }: { selector?: string }) {
     const page = await getPage();
-    console.error(`📖 Extraindo texto${selector ? ` de: ${selector}` : " da página inteira"}...`);
+    console.error(`📖 Extracting text${selector ? ` de: ${selector}` : " da página inteira"}...`);
     let text: string;
     if (selector) {
       const el = await page.$(selector);
       if (!el) {
         return {
-          content: [{ type: "text", text: `Elemento não encontrado: ${selector}` }],
+          content: [{ type: "text", text: `Element não encontrado: ${selector}` }],
           isError: true,
         };
       }

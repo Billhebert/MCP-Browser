@@ -1,11 +1,10 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const analyzeResponsiveTool: ToolDefinition = {
   name: "analyze_responsive",
-  description:
-    "Testar responsividade da página atual em múltiplos viewports. Tira screenshots em cada tamanho especificado e retorna como imagens base64 com metadados.",
+  description: "Test responsive layout across multiple viewport sizes.",
   args: {
     viewports: z.string().max(50000).optional().describe("JSON array de viewports: [{\"width\":375,\"height\":667,\"name\":\"mobile\"}, ...]. Padrão: mobile(375x667), tablet(768x1024), desktop(1440x900)"),
   },

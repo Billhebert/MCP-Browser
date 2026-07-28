@@ -1,14 +1,13 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { sendWebhook, loadWebhooks } from "../corporate/webhook.js";
 
 export const sendWebhookTool: ToolDefinition = {
   name: "send_webhook",
-  description:
-    "Enviar notificação via webhook corporativo. Configurar webhooks via env var BVP_WEBHOOKS como JSON array: [{\"url\":\"https://hooks.slack.com/...\",\"events\":[\"audit_complete\",\"*\"],\"headers\":{\"Authorization\":\"Bearer ...\"}}]. Events comuns: audit_complete, error, schedule_tick.",
+  description: "Send a webhook to configured URLs with custom payload and event filtering.",
   args: {
-    event: z.string().max(100).describe("Nome do evento: 'audit_complete', 'error', 'custom'"),
-    payload: z.string().max(50000).describe("JSON string com payload a enviar"),
+    event: z.string().max(100).describe("Event name: 'audit_complete', 'error', 'custom'"),
+    payload: z.string().max(50000).describe("JSON string with payload to send"),
   },
   async execute(args: { event: string; payload: string }) {
     loadWebhooks();

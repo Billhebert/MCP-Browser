@@ -1,11 +1,10 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const setViewportTool: ToolDefinition = {
   name: "set_viewport",
-  description:
-    "Alterar o tamanho da janela do navegador para emular dispositivos. Predefinições: 'desktop' (1920x1080), 'tablet' (768x1024), 'mobile' (375x667). Ou especifique width e height manualmente.",
+  description: "Change the browser viewport size.",
   args: {
     device: z
       .enum(["desktop", "tablet", "mobile"])

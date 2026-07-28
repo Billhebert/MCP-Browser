@@ -1,17 +1,16 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const askTool: ToolDefinition = {
   name: "ask",
-  description:
-    "EXIBE UMA MENSAGEM PARA O USUÁRIO E AGUARDA RESPOSTA. Use esta tool para perguntar qualquer coisa ao usuário antes de prosseguir. É OBRIGATÓRIO usar depois de cada navegação e antes de cada ação destrutiva.",
+  description: "Display a question to the user and wait for response.",
   args: {
-    question: z.string().max(5000).describe("Pergunta clara sobre o que precisa saber ou confirmar"),
+    question: z.string().max(5000).describe("Pergunta clara about o que precisa saber ou confirmar"),
     context: z
       .string().max(5000)
       .optional()
-      .describe("Contexto opcional: URL atual, título, resumo do que encontrou na página"),
+      .describe("Contexto optional: URL current, título, resumo do que encontrou na page"),
   },
   async execute({ question, context }: { question: string; context?: string }) {
     const page = await getPage();

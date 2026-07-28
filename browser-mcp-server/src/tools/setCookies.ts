@@ -1,17 +1,16 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const setCookiesTool: ToolDefinition = {
   name: "set_cookies",
-  description:
-    "Injetar cookies manualmente no navegador. Útil para autenticação ou testar estados específicos sem passar pelo fluxo de login.",
+  description: "Set cookies for the current page.",
   args: {
     cookies: z
       .array(
         z.object({
-          name: z.string().max(500).describe("Nome do cookie"),
-          value: z.string().max(5000).describe("Valor do cookie"),
+          name: z.string().max(500).describe("Name do cookie"),
+          value: z.string().max(5000).describe("Value do cookie"),
           domain: z.string().max(5000).optional().describe("Domínio (ex: '.exemplo.com')"),
           path: z.string().max(5000).optional().describe("Path (padrão: '/')"),
           httpOnly: z.boolean().optional(),

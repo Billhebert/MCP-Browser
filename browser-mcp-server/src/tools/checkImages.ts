@@ -1,10 +1,9 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage, getNetworkLogs } from "../browser.js";
 
 export const checkImagesTool: ToolDefinition = {
   name: "check_images",
-  description:
-    "Auditar imagens na página atual. Verifica dimensões (oversized vs exibidas), formato, alt text, lazy loading, tamanho de arquivo via network log, e imagens não carregadas.",
+  description: "Audit images: alt text, broken images, lazy loading, sizes.",
   args: {},
   async execute() {
     const page = await getPage();

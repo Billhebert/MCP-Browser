@@ -1,16 +1,15 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const getFormFieldsTool: ToolDefinition = {
   name: "get_form_fields",
-  description:
-    "Listar todos os campos de formulário na página (input, select, textarea, button) com seus seletores, tipos, labels e valores atuais.",
+  description: "List all form fields on the page.",
   args: {
     includeHidden: z
       .boolean()
       .optional()
-      .describe("Se true, inclui campos ocultos (type=hidden)"),
+      .describe("If true, inclui campos hiddens (type=hidden)"),
   },
   async execute({ includeHidden }: { includeHidden?: boolean }) {
     const page = await getPage();
@@ -95,7 +94,7 @@ export const getFormFieldsTool: ToolDefinition = {
       )
       .join("\n\n");
 
-    console.error(`✅ Encontrados ${fields.length} campos`);
+    console.error(`✅ Found ${fields.length} campos`);
     return { content: [{ type: "text", text }] };
   },
 };

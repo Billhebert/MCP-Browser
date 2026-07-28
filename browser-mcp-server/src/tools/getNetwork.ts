@@ -1,20 +1,19 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getNetworkLogs, clearNetworkLogs } from "../browser.js";
 
 export const getNetworkTool: ToolDefinition = {
   name: "get_network",
-  description:
-    "Obter o histórico de requisições de rede da página (fetch, XHR, imagens, scripts). Útil para depurar erros de API, ver status codes, etc.",
+  description: "Get all captured network requests with status and timing.",
   args: {
     clear: z
       .boolean()
       .optional()
-      .describe("Se true, limpa o histórico após retornar"),
+      .describe("If true, limpa o histórico após retornar"),
     status: z
       .number()
       .optional()
-      .describe("Filtrar por status HTTP (ex: 200, 404, 500)"),
+      .describe("Filter  por status HTTP (ex: 200, 404, 500)"),
     type: z
       .string().max(100)
       .optional()
@@ -22,11 +21,11 @@ export const getNetworkTool: ToolDefinition = {
     method: z
       .enum(["GET", "POST", "PUT", "DELETE", "PATCH"])
       .optional()
-      .describe("Filtrar por método HTTP"),
+      .describe("Filter  por método HTTP"),
     url: z
       .string().max(5000)
       .optional()
-      .describe("Filtrar por padrão na URL"),
+      .describe("Filter  por default na URL"),
   },
   async execute(args: {
     clear?: boolean;

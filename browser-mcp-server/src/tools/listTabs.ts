@@ -1,9 +1,9 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getAllPages } from "../browser.js";
 
 export const listTabsTool: ToolDefinition = {
   name: "list_tabs",
-  description: "Listar todas as abas/janelas abertas no navegador com seus títulos e URLs.",
+  description: "List all open tabs with titles and URLs.",
   args: {},
   async execute() {
     console.error(`📑 Listando abas abertas...`);

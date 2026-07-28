@@ -1,15 +1,14 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const ciCheckTool: ToolDefinition = {
   name: "ci_check",
-  description:
-    "Executar auditoria completa para CI/CD. Roda uma suite de ferramentas, consolida scores, e retorna pass/fail com base em thresholds configuráveis. Ideal para integrar em pipelines (exit code via output).",
+  description: "Run CI validation: thresholds, errors, budgets. Returns pass/fail.",
   args: {
-    minScore: z.string().max(100).optional().describe("Score mínimo para passar (0-100, padrão: 70)"),
-    maxIssues: z.string().max(100).optional().describe("Número máximo de issues aceitável (padrão: 10)"),
-    tools: z.string().max(50000).optional().describe("JSON array de tools para incluir (padrão: todas audit)"),
+    minScore: z.string().max(100).optional().describe("Score  minimum para passar (0-100, default: 70)"),
+    maxIssues: z.string().max(100).optional().describe("Número maximum de issues aceitável (default: 10)"),
+    tools: z.string().max(50000).optional().describe("JSON array de tools para include (default: todas audit)"),
   },
   async execute(args: { minScore?: string; maxIssues?: string; tools?: string }) {
     const page = await getPage();

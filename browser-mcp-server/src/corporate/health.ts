@@ -88,6 +88,13 @@ export function startHealthServer(port = parseInt(process.env.BVP_HEALTH_PORT ||
       res.end("Not found");
     }
   });
+  server.on("error", (err: NodeJS.ErrnoException) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(`Health server port ${port} in use, skipping health server`);
+    } else {
+      console.error(`Health server error:`, err.message);
+    }
+  });
   server.listen(port, () => {
     console.error(`Health server listening on :${port}`);
   });

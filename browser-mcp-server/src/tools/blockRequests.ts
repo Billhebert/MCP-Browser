@@ -1,11 +1,10 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { setBlockedPatterns, getBlockedPatterns } from "../browser.js";
 
 export const blockRequestsTool: ToolDefinition = {
   name: "block_requests",
-  description:
-    "Bloquear requisições de rede para domínios/URLs específicos. Útil para bloquear anúncios, analytics ou scripts lentos. Use clear=true para limpar todos os bloqueios.",
+  description: "Block network requests matching URL patterns.",
   args: {
     patterns: z
       .array(z.string().max(100))
@@ -16,7 +15,7 @@ export const blockRequestsTool: ToolDefinition = {
     clear: z
       .boolean()
       .optional()
-      .describe("Se true, limpa todos os bloqueios ativos"),
+      .describe("If true, limpa todos os bloqueios ativos"),
   },
   async execute({
     patterns,
@@ -25,7 +24,7 @@ export const blockRequestsTool: ToolDefinition = {
     patterns?: string[];
     clear?: boolean;
   }) {
-    console.error(`🚫 Gerenciando bloqueios de requisição...`);
+    console.error(`🚫 Managing blocks de requisição...`);
 
     if (clear) {
       setBlockedPatterns([]);
@@ -46,7 +45,7 @@ export const blockRequestsTool: ToolDefinition = {
 
     if (patterns && patterns.length > 0) {
       setBlockedPatterns(patterns);
-      console.error(`✅ Bloqueios ativos: ${patterns.join(", ")}`);
+      console.error(`✅ Active blocks: ${patterns.join(", ")}`);
       return {
         content: [
           {
@@ -67,7 +66,7 @@ export const blockRequestsTool: ToolDefinition = {
           type: "text",
           text:
             current.length > 0
-              ? `Bloqueios ativos:\n${current.map((p) => `  🚫 ${p}`).join("\n")}`
+              ? `Active blocks:\n${current.map((p) => `  🚫 ${p}`).join("\n")}`
               : "Nenhum bloqueio ativo no momento.",
         },
       ],

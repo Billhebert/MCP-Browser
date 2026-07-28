@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 function parseColor(cssColor: string): { r: number; g: number; b: number } | null {
@@ -39,8 +39,7 @@ function contrastRatio(fg: string, bg: string): number {
 
 export const checkContrastTool: ToolDefinition = {
   name: "check_contrast",
-  description:
-    "Auditar contraste de cores na página atual. Verifica texto vs fundo contra WCAG AA (4.5:1 normal, 3:1 large) e AAA (7:1 normal, 4.5:1 large). Retorna score 0-100 com issues detalhadas.",
+  description: "Audit color contrast against WCAG 2.2 AA/AAA. Returns score 0-100.",
   args: {
     level: z.string().max(100).optional().describe("Nível WCAG: 'aa' (padrão) ou 'aaa'"),
   },

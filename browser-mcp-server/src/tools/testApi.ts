@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { isSafeUrl } from "../corporate/ssrf.js";
 
 function validateSchema(body: any, schema: Record<string, string>): string[] {
@@ -20,14 +20,13 @@ function validateSchema(body: any, schema: Record<string, string>): string[] {
 
 export const testApiTool: ToolDefinition = {
   name: "test_api",
-  description:
-    "Testar um endpoint de API via HTTP. Faz requisição com método/configuração especificados, valida status code, tempo de resposta, e schema JSON. Não usa o navegador — chamada direta via Node. Útil para testar APIs do sistema que o browser está acessando.",
+  description: "Test an API endpoint. Supports GET, POST, PUT, DELETE.",
   args: {
-    url: z.string().max(5000).describe("URL do endpoint para testar"),
+    url: z.string().max(5000).describe("URL do endpoint para test"),
     method: z
       .string().max(5000)
       .optional()
-      .describe("Método HTTP: GET, POST, PUT, DELETE, PATCH (padrão: GET)"),
+      .describe("Método HTTP: GET, POST, PUT, DELETE, PATCH (default: GET)"),
     expectedStatus: z
       .string().max(5000)
       .optional()
@@ -43,7 +42,7 @@ export const testApiTool: ToolDefinition = {
       .optional()
       .describe("Headers customizados como string JSON (ex: '{\"Authorization\":\"Bearer xyz\"}')"),
     body: z.string().max(50000).optional().describe("Body da requisição (string)"),
-    maxTime: z.string().max(5000).optional().describe("Tempo máximo em ms (padrão: 30000)"),
+    maxTime: z.string().max(5000).optional().describe("Tempo maximum em ms (default: 30000)"),
   },
   async execute(args: {
     url: string;

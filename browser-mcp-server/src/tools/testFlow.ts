@@ -1,11 +1,10 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const testFlowTool: ToolDefinition = {
   name: "test_flow",
-  description:
-    "Executar um fluxo de usuário gravado (teste E2E simples). Recebe um array de steps: { action: 'navigate'|'click'|'fill'|'select'|'wait'|'assert_text'|'assert_url'|'screenshot', selector?, value?, url?, text?, timeout? }. Retorna resultados de cada step.",
+  description: "Execute a sequence of steps and report results.",
   args: {
     steps: z.string().max(50000).describe("JSON array de steps do fluxo. Ex: [{\"action\":\"navigate\",\"url\":\"https://...\"}, {\"action\":\"click\",\"selector\":\"#btn\"}]"),
     screenshotOnError: z.string().max(5000).optional().describe("Se 'true', captura screenshot em caso de erro"),

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 
 const EXPLANATIONS: Record<string, string> = {
   csp: "Content-Security-Policy é um header HTTP que previne ataques XSS e injeção de código. Sem ele, a página é vulnerável a scripts maliciosos.",
@@ -8,18 +8,17 @@ const EXPLANATIONS: Record<string, string> = {
   contrast: "Contraste insuficiente dificulta a leitura para pessoas com baixa visão ou daltonismo. WCAG recomenda 4.5:1 para texto normal.",
   "missing alt": "Atributo alt é essencial para leitores de tela. Imagens sem alt são invisíveis para usuários com deficiência visual.",
   oversized: "Imagens maiores que o necessário aumentam o tempo de carregamento e consomem dados móveis desnecessariamente.",
-  "cache-control": "Headers de cache inadequados forçam o navegador a baixar recursos repetidamente, aumentando o tempo de carga em visitas subsequentes.",
+  "cache-control": "Headers de cache inadequados forçam o browser a baixar recursos repetidamente, aumentando o tempo de carga em visitas subsequentes.",
   "json-ld": "JSON-LD é o formato recomendado pelo Google para dados estruturados. Dados estruturados corretos habilitam rich snippets nos resultados de busca.",
   "skip link": "Skip links permitem que usuários de teclado pulem diretamente para o conteúdo principal, evitando navegação repetitiva.",
   "console.error": "Erros no console indicam problemas de JavaScript que podem causar comportamento inesperado ou quebra de funcionalidades.",
-  sri: "Subresource Integrity (atributo integrity) garante que arquivos CDN não foram adulterados. Sem SRI, um CDN comprometido pode injetar código malicioso.",
+  sri: "Subresource Integrity (atributo integrity) garante que files CDN não foram adulterados. Sem SRI, um CDN comprometido pode injetar código malicioso.",
   cors: "Cross-Origin Resource Sharing configurado como '*' permite que qualquer site leia as respostas da API, expondo dados potencialmente sensíveis.",
 };
 
 export const explainIssueTool: ToolDefinition = {
   name: "explain_issue",
-  description:
-    "Explicar um issue técnico em linguagem simples. Recebe o JSON de um issue (type, severity, message) e retorna explicação em português claro, impacto, e sugestão de prioridade.",
+  description: "Explain a specific SEO or a11y issue with solutions.",
   args: {
     type: z.string().max(100).describe("Tipo do issue (ex: 'csp', 'contrast', 'missing alt')"),
     message: z.string().max(5000).optional().describe("Mensagem do issue para contexto adicional"),

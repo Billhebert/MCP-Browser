@@ -1,10 +1,9 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const analyzeDepsTool: ToolDefinition = {
   name: "analyze_deps",
-  description:
-    "Detectar bibliotecas e frameworks JavaScript carregados na página. Varre window globals, scripts carregados, e identifica versões de React, Vue, Angular, jQuery, Lodash, e outras 20+ libs.",
+  description: "Detect frontend libraries and check for known CVEs.",
   args: {},
   async execute() {
     const page = await getPage();

@@ -1,16 +1,15 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { addSchedule, listSchedules, removeSchedule, toggleSchedule } from "../corporate/collab.js";
 
 export const scheduleAuditTool: ToolDefinition = {
   name: "schedule_audit",
-  description:
-    "Agendar auditorias recorrentes via cron simplificado. Suporta formato: 'minuto hora' (ex: '0 9' = 09:00, '* 8' = toda hora entre 8-9). Lista, adiciona, remove e ativa/desativa agendamentos. Schedules são verificados a cada 30s.",
+  description: "Schedule a recurring audit using cron expression.",
   args: {
     action: z.string().max(100).describe("Ação: 'add', 'list', 'remove', 'toggle'"),
-    tool: z.string().max(500).optional().describe("Nome da tool para agendar (obrigatório para add)"),
+    tool: z.string().max(500).optional().describe("Name da tool para agendar (obrigatório para add)"),
     cron: z.string().max(500).optional().describe("Expressão cron simplificada: 'minuto hora', ex: '0 9' para 09:00, '30 14' para 14:30"),
-    args: z.string().max(50000).optional().describe("JSON string com argumentos da tool (opcional)"),
+    args: z.string().max(50000).optional().describe("JSON string with argumentos da tool (optional)"),
     id: z.string().max(500).optional().describe("ID do schedule (obrigatório para remove/toggle)"),
     enabled: z.string().max(5000).optional().describe("Ativar/desativar: 'true' ou 'false' (para toggle)"),
   },

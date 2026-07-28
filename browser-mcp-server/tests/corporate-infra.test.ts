@@ -18,7 +18,7 @@ try { fs.unlinkSync(path.join(os.homedir(), ".bvp-audit", "audit.jsonl")); } cat
 describe("auditTrail", () => {
   it("writeAudit e readAudits", async () => {
     await writeAudit({ timestamp: "2025-01-01", tool: "ut-test", user: "tester", session: "s1", args: {}, result: { status: "pass", score: 90 }, durationMs: 100 });
-    const entries = readAudits(10);
+    const entries = await readAudits(10);
     const ours = entries.filter(e => e.tool === "ut-test");
     expect(ours.length).toBeGreaterThanOrEqual(1);
     expect(ours[0].result.score).toBe(90);
@@ -27,10 +27,10 @@ describe("auditTrail", () => {
   it("readAudits com filtro", async () => {
     await writeAudit({ timestamp: "2025-01-01", tool: "ut-seo", user: "t1", session: "s1", args: {}, result: { status: "pass" }, durationMs: 10 });
     await writeAudit({ timestamp: "2025-01-01", tool: "ut-a11y", user: "t1", session: "s1", args: {}, result: { status: "fail" }, durationMs: 10 });
-    const filtered = readAudits(100, { tool: "ut-seo" });
+    const filtered = await readAudits(100, { tool: "ut-seo" });
     expect(filtered.length).toBe(1);
     expect(filtered[0].tool).toBe("ut-seo");
-    const failFilter = readAudits(100, { status: "fail" });
+    const failFilter = await readAudits(100, { status: "fail" });
     expect(failFilter.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -38,7 +38,7 @@ describe("auditTrail", () => {
     await writeAudit({ timestamp: "2025-01-01", tool: "ut-stats-a", user: "u", session: "s", args: {}, result: { status: "pass", score: 80 }, durationMs: 5 });
     await writeAudit({ timestamp: "2025-01-01", tool: "ut-stats-a", user: "u", session: "s", args: {}, result: { status: "fail" }, durationMs: 5 });
     await writeAudit({ timestamp: "2025-01-01", tool: "ut-stats-b", user: "u", session: "s", args: {}, result: { status: "pass", score: 100 }, durationMs: 5 });
-    const stats = getAuditStats();
+    const stats = await getAuditStats();
     expect(stats.totalExecutions).toBeGreaterThanOrEqual(3);
     expect(stats.totalErrors).toBeGreaterThanOrEqual(1);
     expect(stats.averageScore).toBeGreaterThan(0);

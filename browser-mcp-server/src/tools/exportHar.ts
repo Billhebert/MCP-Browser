@@ -1,16 +1,15 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage, getNetworkLogs, clearNetworkLogs } from "../browser.js";
 
 export const exportHarTool: ToolDefinition = {
   name: "export_har",
-  description:
-    "Exportar todas as requisições de rede capturadas no formato HAR (HTTP Archive). Útil para compartilhar com desenvolvedores ou analisar performance.",
+  description: "Export all network requests as HAR (HTTP Archive) JSON.",
   args: {
     clear: z
       .boolean()
       .optional()
-      .describe("Se true, limpa o log de rede após exportar"),
+      .describe("If true, limpa o log de rede após exportar"),
   },
   async execute({ clear }: { clear?: boolean }) {
     const page = await getPage();

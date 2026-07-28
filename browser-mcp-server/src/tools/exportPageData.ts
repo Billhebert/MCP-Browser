@@ -1,10 +1,9 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage, getNetworkLogs } from "../browser.js";
 
 export const exportPageDataTool: ToolDefinition = {
   name: "export_page_data",
-  description:
-    "Exportar dados estruturados completos da página atual: metadados (<title>, <meta>), dados estruturados (JSON-LD, microdata), imagens (src, alt, dimensões), links internos/externos, e informações de rede. Retorna bundle JSON completo.",
+  description: "Export all page data as structured JSON.",
   args: {},
   async execute() {
     const page = await getPage();

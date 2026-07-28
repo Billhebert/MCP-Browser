@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getContext } from "../browser.js";
 import { isSafeUrl } from "../corporate/ssrf.js";
 
@@ -53,23 +53,22 @@ async function fetchSitemapXml(url: string, signal?: AbortSignal): Promise<strin
 
 export const crawlPagesTool: ToolDefinition = {
   name: "crawl_pages",
-  description:
-    "Descobrir e navegar por URLs de um site. Primeiro tenta sitemap.xml, depois robots.txt, depois crawling ao vivo (segue links). Usa abas do navegador atual. Útil para mapear o site que você está navegando.",
+  description: "Discover URLs from a site using sitemap, robots.txt, and live crawling.",
   args: {
-    url: z.string().max(5000).optional().describe("URL para começar o crawl (padrão: URL atual)"),
-    maxDepth: z.string().max(100).optional().describe("Profundidade máxima de navegação (padrão: 2)"),
-    maxPages: z.string().max(100).optional().describe("Número máximo de páginas para visitar (padrão: 10)"),
-    exclude: z.string().max(100).optional().describe("Padrões de URL para excluir (separados por vírgula)"),
-    include: z.string().max(100).optional().describe("Padrões de URL para incluir (separados por vírgula)"),
-    sitemap: z.string().max(5000).optional().describe("Se 'false', pula sitemap.xml (padrão: true)"),
+    url: z.string().max(5000).optional().describe("Starting URL. Default: current page"),
+    maxDepth: z.number().int().positive().optional().describe("Maximum crawl depth. Default: 2"),
+    maxPages: z.number().int().positive().optional().describe("Maximum pages to visit. Default: 10"),
+    exclude: z.string().max(100).optional().describe("URL patterns to exclude (withma separated)"),
+    include: z.string().max(100).optional().describe("URL patterns to include (withma separated)"),
+    sitemap: z.boolean().optional().describe("Use sitemap.xml. Default: true"),
   },
   async execute(args: {
     url?: string;
-    maxDepth?: string;
-    maxPages?: string;
+    maxDepth?: number;
+    maxPages?: number;
     exclude?: string;
     include?: string;
-    sitemap?: string;
+    sitemap?: boolean;
   }) {
     const ctx = await getContext();
     const startUrl = args.url || ctx.pages()[0]?.url();
@@ -80,19 +79,19 @@ export const crawlPagesTool: ToolDefinition = {
       };
     }
 
-    const maxDepth = parseInt(args.maxDepth || "2", 10);
-    const maxPages = parseInt(args.maxPages || "10", 10);
+    const maxDepth = args.maxDepth || 2;
+    const maxPages = args.maxPages || 10;
     const exclude = args.exclude ? args.exclude.split(",").map((s) => s.trim()) : [];
     const include = args.include ? args.include.split(",").map((s) => s.trim()) : [];
-    const useSitemap = args.sitemap !== "false";
+    const useSitemap = args.sitemap !== false;
 
-    console.error(`🕷 Crawl: ${startUrl} (max ${maxPages} páginas, profundidade ${maxDepth})`);
+    console.error(`🕷 Crawl: ${startUrl} (max ${maxPages} pages, depth ${maxDepth})`);
 
     const discovered = new Set<string>();
     let source: "sitemap" | "live" | "manual" = "manual";
 
     if (useSitemap) {
-      console.error(`  Verificando sitemap.xml...`);
+      console.error(`  Checking sitemap.xml...`);
       const ac = new AbortController();
       const timeout = setTimeout(() => ac.abort(), 10000);
       try {
@@ -151,7 +150,7 @@ export const crawlPagesTool: ToolDefinition = {
       }
 
       source = "live";
-      console.error(`  Live: ${visited.size} páginas visitadas`);
+      console.error(`  Live: ${visited.size} pages visitadas`);
     }
 
     const urls = Array.from(discovered);

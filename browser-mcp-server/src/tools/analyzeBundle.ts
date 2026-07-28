@@ -1,10 +1,9 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage, getNetworkLogs } from "../browser.js";
 
 export const analyzeBundleTool: ToolDefinition = {
   name: "analyze_bundle",
-  description:
-    "Analisar bundles JavaScript da página atual. Identifica scripts carregados (inline vs externo), estima tamanho via network log, detecta frameworks, e lista dependências externas.",
+  description: "Analyze JavaScript bundles: scripts, sizes, third-party.",
   args: {},
   async execute() {
     const page = await getPage();

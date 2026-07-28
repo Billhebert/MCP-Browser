@@ -1,10 +1,9 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const checkReadabilityTool: ToolDefinition = {
   name: "check_readability",
-  description:
-    "Analisar legibilidade do texto da página atual. Calcula métricas: densidade de palavras, tamanho médio de frases, parágrafos longos, porcentagem de texto vs HTML, e estimativa de tempo de leitura.",
+  description: "Analyze text readability using Flesch-Kincaid scores.",
   args: {},
   async execute() {
     const page = await getPage();

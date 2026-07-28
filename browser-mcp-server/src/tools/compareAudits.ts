@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 
 interface AuditData {
   score?: number;
@@ -21,11 +21,10 @@ function computeScore(data: AuditData): number {
 
 export const compareAuditsTool: ToolDefinition = {
   name: "compare_audits",
-  description:
-    "Comparar dois resultados de auditoria (before/after). Mostra evolução de score, issues novos, issues resolvidos, e pioras. Útil para validar correções em PRs, deploys, e sprints.",
+  description: "Compare two audit results and show differences.",
   args: {
-    before: z.string().max(50000).describe("JSON string com resultado da auditoria anterior (baseline)"),
-    after: z.string().max(50000).describe("JSON string com resultado da auditoria atual"),
+    before: z.string().max(50000).describe("JSON string with resultado da auditoria anterior (baseline)"),
+    after: z.string().max(50000).describe("JSON string with resultado da auditoria current"),
   },
   async execute(args: { before: string; after: string }) {
     const before: AuditData = JSON.parse(args.before);

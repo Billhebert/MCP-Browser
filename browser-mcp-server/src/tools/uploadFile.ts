@@ -1,19 +1,19 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 import path from "path";
 import fs from "fs";
 
 export const uploadFileTool: ToolDefinition = {
   name: "upload_file",
-  description: "Fazer upload de um arquivo em um campo input[type=file].",
+  description: "Upload a file to a file input element.",
   args: {
     selector: z
       .string().max(2000)
-      .describe("Seletor CSS do input[type=file] (ex: '#file-upload', 'input[type=\"file\"]')"),
+      .describe("CSS selector do input[type=file] (ex: '#file-upload', 'input[type=\"file\"]')"),
     filePath: z
       .string().max(2000)
-      .describe("Caminho absoluto do arquivo no sistema (ex: '/home/user/documento.pdf')"),
+      .describe("Path absoluto do File no sistema (ex: '/home/user/documento.pdf')"),
   },
   async execute({ selector, filePath }: { selector: string; filePath: string }) {
     const page = await getPage();
@@ -21,7 +21,7 @@ export const uploadFileTool: ToolDefinition = {
 
     if (!fs.existsSync(filePath)) {
       return {
-        content: [{ type: "text", text: `Arquivo não encontrado: ${filePath}` }],
+        content: [{ type: "text", text: `File não encontrado: ${filePath}` }],
         isError: true,
       };
     }

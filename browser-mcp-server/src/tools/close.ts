@@ -1,19 +1,19 @@
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { closeBrowser } from "../browser.js";
 
 export const closeTool: ToolDefinition = {
   name: "close",
-  description: "Fechar o navegador e limpar a sessão. SÓ use se o usuário solicitar explicitamente.",
+  description: "Close the current page or browser.",
   args: {},
   async execute() {
-    console.error(`🔒 Fechando navegador...`);
+    console.error(`🔒 Closing browser...`);
     await closeBrowser();
-    console.error(`✅ Navegador fechado`);
+    console.error(`✅ Browser fechado`);
     return {
       content: [
         {
           type: "text",
-          text: JSON.stringify({ success: true, message: "Navegador fechado" }),
+          text: JSON.stringify({ success: true, message: "Browser fechado" }),
         },
       ],
     };

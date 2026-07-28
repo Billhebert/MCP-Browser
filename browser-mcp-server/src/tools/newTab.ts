@@ -1,19 +1,19 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getContext, setupPageListeners } from "../browser.js";
 
 export const newTabTool: ToolDefinition = {
   name: "new_tab",
-  description: "Abrir uma nova aba no navegador (a aba atual continua aberta).",
+  description: "Open a new browser tab.",
   args: {
     url: z
       .string().max(5000)
       .url()
       .optional()
-      .describe("URL opcional para navegar na nova aba"),
+      .describe("URL optional para navigate na nova aba"),
   },
   async execute({ url }: { url?: string }) {
-    console.error(`📑 Abrindo nova aba${url ? ` para: ${url}` : ""}...`);
+    console.error(`📑 Opening new tab${url ? ` para: ${url}` : ""}...`);
     const ctx = await getContext();
     const newPage = await ctx.newPage();
     await setupPageListeners(newPage);

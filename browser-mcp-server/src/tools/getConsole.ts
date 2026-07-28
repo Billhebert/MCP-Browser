@@ -1,16 +1,15 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getConsoleLogs, clearConsoleLogs } from "../browser.js";
 
 export const getConsoleTool: ToolDefinition = {
   name: "get_console",
-  description:
-    "Obter os logs do console do navegador (console.log, console.error, console.warn, etc). Útil para depurar erros de JavaScript na página.",
+  description: "Retrieve all captured console logs from the current page.",
   args: {
     clear: z
       .boolean()
       .optional()
-      .describe("Se true, limpa os logs após retornar"),
+      .describe("If true, limpa os logs após retornar"),
     type: z
       .enum(["error", "warning", "log", "pageerror"])
       .optional()

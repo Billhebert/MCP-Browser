@@ -1,16 +1,16 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getAllPages, setupPageListeners } from "../browser.js";
 
 export const switchTabTool: ToolDefinition = {
   name: "switch_tab",
-  description: "Mudar para uma aba específica pelo índice (use list_tabs para ver os índices).",
+  description: "Switch to a tab by index or URL.",
   args: {
     index: z
       .number()
       .int()
       .min(0)
-      .describe("Índice da aba para ativar (0 = primeira aba)"),
+      .describe("Índice da aba para activate (0 = primeira aba)"),
   },
   async execute({ index }: { index: number }) {
     console.error(`📑 Mudando para aba [${index}]...`);

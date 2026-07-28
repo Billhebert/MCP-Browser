@@ -1,13 +1,12 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getCDPSession, getPage } from "../browser.js";
 
 export const listExtensionsTool: ToolDefinition = {
   name: "list_extensions",
-  description:
-    "Listar todas as extensões instaladas no navegador. Retorna ID, nome, versão, caminho e status (enabled/disabled). Útil para verificar extensões carregadas via BVP_EXTENSIONS ou install_extension.",
+  description: "List installed Chrome extensions.",
   args: {
-    enabled: z.boolean().optional().describe("Filtrar: true só enabled, false só disabled, omitir = todas"),
+    enabled: z.boolean().optional().describe("Filter : true só enabled, false só disabled, omitir = todas"),
   },
   async execute(args: { enabled?: boolean }) {
     const page = await getPage();
@@ -41,7 +40,7 @@ export const listExtensionsTool: ToolDefinition = {
       };
     } catch (err) {
       return {
-        content: [{ type: "text", text: JSON.stringify({ error: `Falha ao listar extensões: ${(err as Error).message}` }, null, 2) }],
+        content: [{ type: "text", text: JSON.stringify({ error: `Falha ao list extensões: ${(err as Error).message}` }, null, 2) }],
         isError: true,
       };
     }

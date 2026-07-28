@@ -1,19 +1,19 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const getCookiesTool: ToolDefinition = {
   name: "get_cookies",
-  description: "Obter todos os cookies da página atual. Útil para verificar sessão e autenticação.",
+  description: "Get all cookies for the current page.",
   args: {
     name: z
       .string().max(500)
       .optional()
-      .describe("Filtrar por nome do cookie"),
+      .describe("Filter  por name do cookie"),
     domain: z
       .string().max(5000)
       .optional()
-      .describe("Filtrar por domínio"),
+      .describe("Filter  por domínio"),
   },
   async execute({ name, domain }: { name?: string; domain?: string }) {
     const page = await getPage();

@@ -1,13 +1,12 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 export const checkAccessibilityTreeTool: ToolDefinition = {
   name: "check_accessibility_tree",
-  description:
-    "Testar navegação por teclado na página atual. Varre elementos focusáveis (Tab), verifica ordem lógica, detecta focus traps, elementos sem foco visível, e falta de skip-links. Não modifica a página.",
+  description: "Extract and analyze the browser accessibility tree.",
   args: {
-    maxTabs: z.string().max(5000).optional().describe("Número máximo de tabs a testar (padrão: 30)"),
+    maxTabs: z.string().max(5000).optional().describe("Número maximum de tabs a test (default: 30)"),
   },
   async execute(args: { maxTabs?: string }) {
     const page = await getPage();
@@ -59,22 +58,22 @@ export const checkAccessibilityTreeTool: ToolDefinition = {
       issues.push({
         type: "accessibility", severity: "medium",
         message: "Skip link ausente",
-        details: "Adicione um link 'Pular para conteúdo' como primeiro elemento focusável",
+        details: "Adicione um link 'Pular para conteúdo' como primeiro element focusável",
       });
     }
 
     if (result.noVisibleFocus > 0) {
       issues.push({
         type: "accessibility", severity: "medium",
-        message: `${result.noVisibleFocus} elemento(s) focusável(is) não visível(is)`,
-        details: "Elementos fora da tela ao receber foco podem confundir navegação por teclado",
+        message: `${result.noVisibleFocus} element(s) focusável(is) não visível(is)`,
+        details: "elements fora da tela ao receber foco podem confundir navegação por teclado",
       });
     }
 
     if (result.totalFocusable === 0) {
       issues.push({
         type: "accessibility", severity: "high",
-        message: "Nenhum elemento focusável encontrado",
+        message: "Nenhum element focusável encontrado",
         details: "Página pode não ser navegável por teclado",
       });
     }

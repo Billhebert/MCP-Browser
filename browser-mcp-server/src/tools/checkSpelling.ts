@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ToolDefinition } from "../index.js";
+import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 
 const COMMON_WORDS = new Set([
@@ -70,8 +70,7 @@ const ALL_WORDS = new Set([...COMMON_WORDS, ...COMMON_PT_WORDS]);
 
 export const checkSpellingTool: ToolDefinition = {
   name: "check_spelling",
-  description:
-    "Verificar ortografia básica no texto visível da página. Detecta palavras potencialmente incorretas usando um dicionário embutido de ~1000 palavras em inglês e português. AVISO: Verificação simplificada — palavras técnicas, nomes próprios e neologismos podem gerar falsos positivos.",
+  description: "Check page content for spelling errors.",
   args: {
     language: z.string().max(100).optional().describe("Idioma: 'en' (inglês, padrão), 'pt' (português), 'both'"),
   },
@@ -119,7 +118,7 @@ export const checkSpellingTool: ToolDefinition = {
         totalUniqueWords: seen.size,
         potentialErrors: potentialErrors.length,
         suggestions: potentialErrors.slice(0, 50),
-        note: "Verificação simplificada. Palavras técnicas, nomes próprios e neologismos podem aparecer como falsos positivos.",
+        note: "Verificação simplificada. Palavras técnicas, names próprios e neologismos podem aparecer como falsos positivos.",
       }, null, 2) }],
     };
   },

@@ -1,0 +1,46 @@
+services:
+  bvp-browser-mcp:
+    build: .
+    image: bvp/browser-mcp:latest
+    container_name: bvp-browser
+    environment:
+      - BROWSER_HEADLESS=true
+      - BVP_AUDIT_DIR=/data/audit
+      - BVP_RATE_LIMIT=120
+      - BVP_MCP_PORT=3100
+      - BVP_WEBHOOKS=${BVP_WEBHOOKS:-[]}
+      - JIRA_HOST=${JIRA_HOST:-}
+      - JIRA_EMAIL=${JIRA_EMAIL:-}
+      - JIRA_TOKEN=${JIRA_TOKEN:-}
+    volumes:
+      - bvp-profile:/home/bvp-user/.bvp-browser-profile
+      - bvp-data:/data
+    ports:
+      - "3100:3100"
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "2"
+        reservations:
+          memory: 512M
+          cpus: "0.5"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3100/health').then(r => process.exit(r.ok?0:1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - bvp-network
+
+networks:
+  bvp-network:
+    driver: bridge
+
+volumes:
+  bvp-profile:
+  bvp-data:

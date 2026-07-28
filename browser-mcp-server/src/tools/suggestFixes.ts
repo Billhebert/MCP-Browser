@@ -49,7 +49,10 @@ export const suggestFixesTool: ToolDefinition = {
     data: z.string().max(50000).describe("JSON string with o resultado de uma ferramenta de auditoria (analyze_seo, check_contrast, etc.)"),
   },
   async execute(args: { data: string }) {
-    const data = JSON.parse(args.data) as Record<string, unknown>;
+    let data: Record<string, unknown>;
+    try { data = JSON.parse(args.data) as Record<string, unknown>; } catch {
+      return { content: [{ type: "text", text: JSON.stringify({ error: "JSON inválido no argumento 'data'. Envie o output de uma ferramenta de auditoria." }) }], isError: true };
+    }
     const issues: Array<Record<string, unknown>> = (data.issues as Array<Record<string, unknown>>) || [];
 
     if (issues.length === 0) {

@@ -1,7 +1,7 @@
 import type { ToolDefinition } from "../types.js";
 import { getPage } from "../browser.js";
 import { getAuditStats } from "../corporate/auditTrail.js";
-import { listSessions, cleanupSessions } from "../corporate/sessions.js";
+import { listSessionsInfo } from "../corporate/sessionManager.js";
 import { getRateLimitStatus } from "../corporate/rateLimiter.js";
 
 export const healthCheckTool: ToolDefinition = {
@@ -22,9 +22,8 @@ export const healthCheckTool: ToolDefinition = {
     }
 
     const stats = await getAuditStats();
-    const sessions = listSessions();
+    const sessions = listSessionsInfo();
     const rateLimit = getRateLimitStatus("global");
-    cleanupSessions();
 
     return {
       content: [{ type: "text", text: JSON.stringify({
@@ -32,7 +31,7 @@ export const healthCheckTool: ToolDefinition = {
         version: "1.0.0",
         browser: { status: browserStatus, currentUrl: pageUrl, currentTitle: pageTitle },
         audit: stats,
-        sessions: { active: sessions.length, names: sessions },
+        sessions,
         rateLimit,
       }, null, 2) }],
     };

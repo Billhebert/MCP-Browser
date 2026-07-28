@@ -27,12 +27,12 @@
   },
   "lint-staged": {
     "browser-mcp-server/src/**/*.ts": [
-      "eslint --fix",
-      "prettier --write"
+      "cd browser-mcp-server && npx eslint --fix",
+      "cd browser-mcp-server && npx prettier --write"
     ],
     "browser-mcp-server/tests/**/*.ts": [
-      "eslint --fix",
-      "prettier --write"
+      "cd browser-mcp-server && npx eslint --fix",
+      "cd browser-mcp-server && npx prettier --write"
     ]
   }
 }

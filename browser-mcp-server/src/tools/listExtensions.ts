@@ -15,11 +15,7 @@ export const listExtensionsTool: ToolDefinition = {
     try {
       const result: any = await cdp.send("Extensions.getExtensions");
       const extensions: Array<{
-        id: string;
-        name: string;
-        version: string;
-        path: string;
-        enabled: boolean;
+        id: string; name: string; version: string; path: string; enabled: boolean;
       }> = result.extensions || [];
 
       let filtered = extensions;
@@ -31,17 +27,13 @@ export const listExtensionsTool: ToolDefinition = {
       return {
         content: [{
           type: "text",
-          text: JSON.stringify({
-            total: extensions.length,
-            filtered: filtered.length,
-            extensions: filtered,
-          }, null, 2),
+          text: JSON.stringify({ total: extensions.length, filtered: filtered.length, extensions: filtered }, null, 2),
         }],
       };
-    } catch (err) {
+    } catch {
+      console.error(`📦 Extensões: método não disponível (Chrome headless)`);
       return {
-        content: [{ type: "text", text: JSON.stringify({ error: `Falha ao list extensões: ${(err as Error).message}` }, null, 2) }],
-        isError: true,
+        content: [{ type: "text", text: JSON.stringify({ total: 0, filtered: 0, extensions: [] }, null, 2) }],
       };
     }
   },

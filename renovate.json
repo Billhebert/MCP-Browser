@@ -1,0 +1,43 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":separateMajorMinor",
+    ":combinePatchMinorUpdates",
+    ":enableVulnerabilityAlerts",
+    "group:allNonMajor"
+  ],
+  "labels": ["dependencies"],
+  "automerge": true,
+  "automergeType": "pr",
+  "platformAutomerge": true,
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    {
+      "matchDepTypes": ["devDependencies"],
+      "automerge": true
+    },
+    {
+      "matchPackageNames": ["@types/*"],
+      "automerge": true
+    },
+    {
+      "matchPackageNames": ["playwright", "@playwright/*"],
+      "groupName": "Playwright packages",
+      "labels": ["playwright"]
+    },
+    {
+      "matchPackageNames": ["@modelcontextprotocol/sdk"],
+      "labels": ["mcp-sdk"],
+      "automerge": false
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "labels": ["security"],
+    "automerge": true
+  },
+  "schedule": ["before 9am on monday"]
+}

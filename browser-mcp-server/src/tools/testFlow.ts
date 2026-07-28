@@ -11,7 +11,10 @@ export const testFlowTool: ToolDefinition = {
   },
   async execute(args: { steps: string; screenshotOnError?: string }) {
     const page = await getPage();
-    const steps: Array<{ action: string; selector?: string; value?: string; url?: string; text?: string; timeout?: string }> = JSON.parse(args.steps);
+    let steps: Array<{ action: string; selector?: string; value?: string; url?: string; text?: string; timeout?: string }>;
+    try { steps = JSON.parse(args.steps); } catch {
+      return { content: [{ type: "text", text: JSON.stringify({ error: "JSON inválido no argumento 'steps'. Envie um array de objetos com {action, ...}." }) }], isError: true };
+    }
     const screenshotOnError = args.screenshotOnError === "true";
 
     const results: Array<{ step: number; action: string; status: string; message: string; screenshot?: string }> = [];

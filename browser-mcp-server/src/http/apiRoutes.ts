@@ -1,5 +1,5 @@
 import type { Express, Request, Response, NextFunction } from "express";
-import { tools, toolMap, getTool, convertToMCPTool } from "../tools/registry.js";
+import { toolMap, convertToMCPTool, getTools, ensureTools } from "../tools/registry.js";
 import { validateApiKey } from "../corporate/auth.js";
 import { ToolExecutorService } from "../services/toolExecutorService.js";
 import { incRequestCount } from "../corporate/health.js";
@@ -26,8 +26,10 @@ export function setupApiRoutes(app: Express) {
     res.json({ status: "ok", timestamp: new Date().toISOString(), version: VERSION });
   });
 
-  app.get("/api/tools", (_req, res) => {
-    res.json({ tools: tools.map((t) => ({
+  app.get("/api/tools", async (_req, res) => {
+    await ensureTools();
+    const allTools = getTools();
+    res.json({ tools: allTools.map((t) => ({
       name: t.name,
       description: t.description,
       args: Object.entries(t.args).map(([key, zodType]) => ({
@@ -36,7 +38,7 @@ export function setupApiRoutes(app: Express) {
         description: zodType.description || key,
         required: !zodType.isOptional(),
       })),
-    })), count: tools.length });
+    })), count: allTools.length });
   });
 
   app.get("/api/tools/:name", (req, res) => {
@@ -83,9 +85,10 @@ export function setupApiRoutes(app: Express) {
     res.json(await getAuditStats());
   }));
 
-  app.get("/api/stats", (_req, res) => {
-    res.json({ version: VERSION, uptime: process.uptime(), toolCount: tools.length, pluginCount: getLoadedPlugins().length, timestamp: new Date().toISOString() });
-  });
+  app.get("/api/stats", asyncHandler(async (_req, res) => {
+    await ensureTools();
+    res.json({ version: VERSION, uptime: process.uptime(), toolCount: getTools().length, pluginCount: getLoadedPlugins().length, timestamp: new Date().toISOString() });
+  }));
 
   app.get("/api/sessions", asyncHandler(async (_req, res) => {
     res.json({ sessions: listSessionsInfo(), current: getCurrentSessionId() });

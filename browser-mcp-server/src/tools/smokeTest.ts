@@ -11,7 +11,10 @@ export const smokeTestTool: ToolDefinition = {
   },
   async execute(args: { urls: string; screenshotOnFail?: string }) {
     const page = await getPage();
-    const urls: Array<{ url: string; expectedText?: string; expectedStatus?: number }> = JSON.parse(args.urls);
+    let urls: Array<{ url: string; expectedText?: string; expectedStatus?: number }>;
+    try { urls = JSON.parse(args.urls); } catch {
+      return { content: [{ type: "text", text: JSON.stringify({ error: "JSON inválido no argumento 'urls'. Envie um array de objetos com {url, expectedText?}." }) }], isError: true };
+    }
     const screenshotOnFail = args.screenshotOnFail === "true";
 
     const results: Array<{

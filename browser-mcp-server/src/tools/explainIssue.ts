@@ -26,6 +26,7 @@ export const explainIssueTool: ToolDefinition = {
   },
   async execute(args: { type: string; message?: string; severity?: string }) {
     const { type, message, severity } = args;
+    if (!type) return { content: [{ type: "text", text: JSON.stringify({ error: "Argumento 'type' é obrigatório (ex: 'contrast', 'csp', 'missing alt')" }) }], isError: true };
     const key = type.toLowerCase();
 
     const explanation = EXPLANATIONS[key] || EXPLANATIONS[Object.keys(EXPLANATIONS).find((k) => (message || "").toLowerCase().includes(k)) || ""]

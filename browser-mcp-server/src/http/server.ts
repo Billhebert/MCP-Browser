@@ -20,7 +20,7 @@ export function startHttpServer(port = parseInt(process.env.BVP_HTTP_PORT || "31
   const webDist = path.resolve(__dirname, "..", "..", "web", "dist");
   if (fs.existsSync(webDist)) {
     app.use(express.static(webDist));
-    app.get("/{*path}", (_req, res) => {
+    app.get("*", (_req, res) => {
       res.sendFile(path.join(webDist, "index.html"));
     });
   }

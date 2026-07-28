@@ -1,6 +1,6 @@
 # MCP-Browser
 
-> 🇧🇷 English version available: [README.en.md](./README.en.md)
+> 🌐 English version — [Versão em Português](./README.md)
 
 [![CI](https://github.com/Billhebert/MCP-Browser/actions/workflows/ci.yml/badge.svg)](https://github.com/Billhebert/MCP-Browser/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
@@ -10,10 +10,10 @@
 [![License](https://img.shields.io/badge/License-ISC-lightgrey)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-175%20%7C%20147%20MCP--passing-success)]()
 
-**MCP-Browser** é um servidor **MCP (Model Context Protocol)** para automação de navegador via **Playwright**. Ele expõe mais de **130 ferramentas** de navegação, teste, auditoria, análise e automação web através dos protocolos **MCP stdio/MCP HTTP**, **REST API** e **WebSocket** — permitindo que LLMs como Claude, agentes de IA, pipelines de CI/CD e interfaces web interajam programaticamente com navegadores Chrome/Chromium.
+**MCP-Browser** is an **MCP (Model Context Protocol)** server for browser automation via **Playwright**. It exposes **130+ tools** for navigation, testing, auditing, analysis, and web automation through **MCP stdio/MCP HTTP**, **REST API**, and **WebSocket** protocols — allowing LLMs like Claude, AI agents, CI/CD pipelines, and web interfaces to programmatically interact with Chrome/Chromium browsers.
 
 ```json
-// Claude Desktop — 2 linhas para ativar 130+ ferramentas de navegador
+// Claude Desktop — 2 lines to enable 130+ browser tools
 {
   "mcpServers": {
     "bvp-browser": { "command": "node", "args": ["dist/index.js"] }
@@ -23,90 +23,90 @@
 
 ---
 
-## Índice
+## Table of Contents
 
-- [O que resolve](#o-que-resolve)
-- [Arquitetura](#arquitetura)
-  - [Diagrama de Componentes (C4)](#diagrama-de-componentes-c4)
-  - [Diagrama de Sequência — CallTool](#diagrama-de-sequência--calltool)
-  - [Diagrama de Estados — Browser Session](#diagrama-de-estados--browser-session)
-  - [Diagrama de Atividades — Pipeline](#diagrama-de-atividades--pipeline)
-  - [Diagrama de Implantação](#diagrama-de-implantação)
-  - [Diagrama de Pacotes](#diagrama-de-pacotes)
+- [What It Solves](#what-it-solves)
+- [Architecture](#architecture)
+  - [Component Diagram (C4)](#component-diagram-c4)
+  - [Sequence Diagram — CallTool](#diagrama-de-sequência--calltool)
+  - [State Diagram — Browser Session](#state-diagram--browser-session)
+  - [Activity Diagram — Pipeline](#activity-diagram--pipeline)
+  - [Deployment Diagram](#diagrama-de-implantação)
+  - [Package Diagram](#package-diagram)
   - [Dual Transport](#dual-transport)
   - [Middleware Pipeline](#middleware-pipeline)
   - [Startup Sequence](#startup-sequence)
   - [Data Flow Diagram (DFD)](#data-flow-diagram-dfd)
-- [Tecnologias](#tecnologias)
-- [Decisões de Arquitetura](#decisões-de-arquitetura)
-- [Análise de Complexidade](#análise-de-complexidade)
-- [Estratégia de Concorrência](#estratégia-de-concorrência)
-- [Gerenciamento de Memória](#gerenciamento-de-memória)
-- [Estratégia de Erros](#estratégia-de-erros)
-- [Segurança em Camadas](#segurança-em-camadas)
-- [Métricas e Observabilidade](#métricas-e-observabilidade)
-- [Padrões de Projeto](#padrões-de-projeto)
+- [Technologies](#technologies)
+- [Architecture Decisions](#decisões-de-arquitetura)
+- [Complexity Analysis](#análise-de-complexidade)
+- [Concurrency Strategy](#estratégia-de-concorrência)
+- [Memory Management](#gerenciamento-de-memória)
+- [Error Strategy](#estratégia-de-erros)
+- [Defense in Depth](#segurança-em-camadas)
+- [Metrics & Observability](#métricas-e-observabilidade)
+- [Design Patterns](#padrões-de-projeto)
 - [Tools (130+)](#tools-130)
-  - [Navegação e Interação](#navegação-e-interação)
-  - [Extração de Dados](#extração-de-dados)
-  - [Auditoria e Qualidade (QA)](#auditoria-e-qualidade-qa)
+  - [Navigation & Interaction](#navegação-e-interação)
+  - [Data Extraction](#extração-de-dados)
+  - [Audit & Quality (QA)](#audit-&-quality-qa)
   - [Performance](#performance)
-  - [Acessibilidade](#acessibilidade)
-  - [Segurança](#segurança)
+  - [Accessibility](#accessibility)
+  - [Security](#segurança)
   - [SEO](#seo)
-  - [Cookies, Storage e Rede](#cookies-storage-e-rede)
-  - [Emulação de Dispositivos](#emulação-de-dispositivos)
-  - [Testes Avançados](#testes-avançados)
-  - [Frontend e Componentes](#frontend-e-componentes)
+  - [Cookies, Storage & Network](#cookies-storage-&-network)
+  - [Device Emulation](#emulação-de-dispositivos)
+  - [Advanced Testing](#testes-avançados)
+  - [Frontend & Components](#frontend-&-components)
   - [Storybook](#storybook)
-  - [SQL e Banco de Dados](#sql-e-banco-de-dados)
-  - [Webhooks e Notificações](#webhooks-e-notificações)
+  - [SQL & Database](#sql-&-database)
+  - [Webhooks & Notifications](#webhooks-e-notificações)
   - [Jira](#jira)
-  - [Sessões e Snapshots](#sessões-e-snapshots)
-  - [Colaboração](#colaboração)
-  - [Scan e Segurança Ofensiva](#scan-e-segurança-ofensiva)
-  - [Utilitários](#utilitários)
-- [Resources MCP](#resources-mcp)
-- [Prompts MCP](#prompts-mcp)
-- [Configuração](#configuração)
-- [API REST](#api-rest)
-- [MCP-Browser vs Alternativas](#mcp-browser-vs-alternativas)
-- [Exemplos de Uso](#exemplos-de-uso)
-- [Desenvolvimento](#desenvolvimento)
-- [Contribuindo](#contribuindo)
+  - [Sessions & Snapshots](#sessões-e-snapshots)
+  - [Collaboration](#colaboração)
+  - [Scan & Offensive Security](#scan-e-segurança-ofensiva)
+  - [Utilities](#utilitários)
+- [MCP Resources](#mcp-resources)
+- [MCP Prompts](#mcp-prompts)
+- [Configuration](#configuração)
+- [REST API](#rest-api)
+- [MCP-Browser vs Alternatives](#mcp-browser-vs-alternatives)
+- [Usage Examples](#usage-examples)
+- [Development](#development)
+- [Contributing](#contributing)
 - [Changelog](#changelog)
-- [Deploy](#deploy)
-- [Documentação Complementar](#documentação-complementar)
+- [Deployment](#deployment)
+- [Additional Documentation](#documentação-complementar)
   - [Architecture Decision Records (ADR)](#architecture-decision-records-adr)
-  - [Runbook de Produção](#runbook-de-produção)
+  - [Production Runbook](#runbook-de-produção)
   - [Benchmarks](#benchmarks)
   - [Threat Model](#threat-model)
   - [Grafana Dashboard](#grafana-dashboard)
   - [Alert Rules](#alert-rules)
-- [Estrutura do Projeto](#estrutura-do-projeto)
+- [Project Structure](#project-structure)
 
 ---
 
-## O que resolve
+## What It Solves
 
-**Problema**: LLMs como Claude não têm acesso nativo a navegadores web. Para executar tarefas como "audite a acessibilidade desta página", "extraia dados desta tabela", "teste este formulário" ou "compare screenshots", é necessário um middleware que traduza intenções em ações concretas no navegador.
+**Problem**: LLMs like Claude don't have native access to web browsers. To execute tasks like "audit this page's accessibility", "extract data from this table", "test this form", or "compare screenshots", a middleware is needed to translate intentions into concrete browser actions.
 
-**Solução**: MCP-Browser atua como uma **ponte** entre LLMs e o navegador Chrome/Chromium, expondo cada ação de navegação, extração, auditoria e teste como uma **tool MCP** individual. O LLM pode chamar qualquer tool via protocolo MCP (stdio ou HTTP), e o servidor executa a ação via Playwright, retornando resultados estruturados.
+**Solution**: MCP-Browser acts as a **bridge** between LLMs and the Chrome/Chromium browser, exposing each navigation, extraction, audit, and test action as an individual **MCP tool**. The LLM can call any tool via the MCP protocol (stdio or HTTP), and the server executes the action via Playwright, returning structured results.
 
-**Casos de uso**:
-- **QA automatizado**: auditoria de acessibilidade (axe-core), performance (Web Vitals), segurança (OWASP Top 10), SEO, contraste, links quebrados
-- **Testes E2E**: navegação, clique, preenchimento de formulários, drag-and-drop, upload de arquivos
-- **Web scraping estruturado**: extração de tabelas, crawling de páginas, exportação CSV/HAR
-- **CI/CD**: validação de performance budgets, contratos de teste, relatórios em JUnit/HTML
-- **Monitoramento**: health checks, métricas Prometheus, webhooks de erro, notificações Slack/Discord
-- **Engenharia reversa**: análise de bundles, detecção de frameworks, scan de endpoints, design system extraction
-- **Testes cross-browser**: mesma URL em Chromium, Firefox e WebKit com comparação visual
+**Use cases**:
+- **Automated QA**: accessibility auditing (axe-core), performance (Web Vitals), security (OWASP Top 10), SEO, contrast, broken links
+- **E2E Testing**: navigation, click, form filling, drag-and-drop, file upload
+- **Structured web scraping**: table extraction, page crawling, CSV/HAR export
+- **CI/CD**: performance budget validation, test contracts, JUnit/HTML reports
+- **Monitoring**: health checks, Prometheus metrics, error webhooks, Slack/Discord notifications
+- **Reverse engineering**: bundle analysis, framework detection, endpoint scanning, design system extraction
+- **Cross-browser testing**: same URL across Chromium, Firefox, and WebKit with visual comparison
 
 ---
 
-## Arquitetura
+## Architecture
 
-### Diagrama de Componentes (C4)
+### Component Diagram (C4)
 
 ```mermaid
 C4Context
@@ -146,7 +146,7 @@ C4Context
   Rel(engine, slack, "sendMessage", "Webhook")
 ```
 
-### Diagrama de Sequência — CallTool
+### Sequence Diagram — CallTool
 
 ```mermaid
 sequenceDiagram
@@ -203,7 +203,7 @@ sequenceDiagram
   S-->>C: CallToolResult { content, isError? }
 ```
 
-### Diagrama de Estados — Browser Session
+### State Diagram — Browser Session
 
 ```mermaid
 stateDiagram-v2
@@ -232,7 +232,7 @@ stateDiagram-v2
   closed --> [*]
 ```
 
-### Diagrama de Atividades — Pipeline
+### Activity Diagram — Pipeline
 
 ```mermaid
 flowchart TD
@@ -262,7 +262,7 @@ flowchart TD
   W --> X[return isError]
 ```
 
-### Diagrama de Implantação
+### Deploymentmentment Diagram
 
 ```mermaid
 deploymentDiagram
@@ -295,7 +295,7 @@ deploymentDiagram
   mcpb --> cr: Playwright CDP
 ```
 
-### Diagrama de Pacotes
+### Package Diagram
 
 ```mermaid
 flowchart LR
@@ -429,7 +429,7 @@ Quando o servidor inicia (`main()` em `index.ts`):
 6. **Conecta MCP stdio** — servidor pronto para Claude Desktop
 7. **Inicia HTTP server** (`startHttpServer()`) — Express + WebSocket
 
-### Diagrama de Classes (C4 Nível 3)
+### Class Diagram (C4 Level 3)
 
 ```mermaid
 classDiagram
@@ -538,7 +538,7 @@ classDiagram
   EventBus --> BvpEvent
 ```
 
-### Diagrama de Sequência — FullSiteAudit
+### Sequence Diagram — FullSiteAudit
 
 ```mermaid
 sequenceDiagram
@@ -652,7 +652,7 @@ flowchart TD
 
 ---
 
-## Tecnologias
+## Technologies
 
 | Tecnologia | Uso | Justificativa |
 |------------|-----|---------------|
@@ -678,7 +678,7 @@ flowchart TD
 
 ---
 
-## Decisões de Arquitetura
+## Architecture Decisions
 
 | Decisão | Opção Rejeitada | Motivo |
 |---------|-----------------|--------|
@@ -693,7 +693,7 @@ flowchart TD
 
 ---
 
-## Análise de Complexidade
+## Complexity Analysis
 
 | Operação | Complexidade | Explicação |
 |----------|-------------|------------|
@@ -711,7 +711,7 @@ flowchart TD
 
 ---
 
-## Estratégia de Concorrência
+## Concurrency Strategy
 
 ### Serialized Execution Queue
 
@@ -740,7 +740,7 @@ export async function serialized<T>(fn: () => Promise<T>): Promise<T> {
 
 ---
 
-## Gerenciamento de Memória
+## Memory Management
 
 ### Browser Lifecycle
 
@@ -784,7 +784,7 @@ Se o total de logs em memória exceder 80% de 5MB, o resource `browser://status`
 
 ---
 
-## Estratégia de Erros
+## Error Strategy
 
 ### Hierarquia
 
@@ -819,7 +819,7 @@ Múltiplas ferramentas implementam cadeias de fallback para resiliência:
 
 ---
 
-## Segurança em Camadas
+## Defense in Depth
 
 ```mermaid
 flowchart LR
@@ -872,7 +872,7 @@ flowchart LR
 
 ---
 
-## Métricas e Observabilidade
+## Metrics & Observability
 
 ### 3 Pilares
 
@@ -913,7 +913,7 @@ bvp_process_memory_bytes{type="rss"} 157286400
 
 ---
 
-## Padrões de Projeto
+## Design Patterns
 
 ### 1. **Model Context Protocol (MCP)**
   - O projeto implementa o protocolo MCP padrão da Anthropic, expondo Tools (ações), Resources (dados) e Prompts (templates) para LLMs.
@@ -972,7 +972,7 @@ bvp_process_memory_bytes{type="rss"} 157286400
 
 ## Tools (130+)
 
-### Navegação e Interação
+### Navigation & Interaction
 
 | Tool | Descrição | Argumentos |
 |------|-----------|------------|
@@ -993,7 +993,7 @@ bvp_process_memory_bytes{type="rss"} 157286400
 | `wait` | Espera por evento ou timeout | `type`, `value?` |
 | `wait_for_element` | Espera elemento aparecer no DOM | `selector`, `timeout?` |
 
-### Extração de Dados
+### Data Extraction
 
 | Tool | Descrição | Argumentos |
 |------|-----------|------------|
@@ -1015,7 +1015,7 @@ bvp_process_memory_bytes{type="rss"} 157286400
 | `get_console` | Recupera logs do console | `clear?`, `type?` |
 | `get_network` | Recupera requisições de rede | `clear?`, `status?`, `type?`, `method?`, `url?` |
 
-### Auditoria e Qualidade (QA)
+### Audit & Quality (QA)
 
 | Tool | Descrição | Argumentos |
 |------|-----------|------------|
@@ -1065,7 +1065,7 @@ bvp_process_memory_bytes{type="rss"} 157286400
 | `analyze_bundle` | Analisa bundles JS (frameworks, tamanhos) | — |
 | `add_performance_mark` | Adiciona marca de performance personalizada | `name`, `data?` |
 
-### Segurança
+### Security
 
 | Tool | Descrição | Argumentos |
 |------|-----------|------------|
@@ -1084,7 +1084,7 @@ bvp_process_memory_bytes{type="rss"} 157286400
 | `analyze_css` | Auditoria CSS (custom properties, unused selectors, cores hardcoded) | — |
 | `analyze_deps` | Detecta dependências frontend e versões | — |
 
-### Cookies, Storage e Rede
+### Cookies, Storage & Network
 
 | Tool | Descrição | Argumentos |
 |------|-----------|------------|
@@ -1093,7 +1093,7 @@ bvp_process_memory_bytes{type="rss"} 157286400
 | `set_local_storage` | Define localStorage para domínio | `items`, `url?` |
 | `set_network` | Simula condições de rede | `preset?`, `latency?`, `download?`, `upload?` |
 
-### Emulação de Dispositivos
+### Device Emulation
 
 | Tool | Descrição | Argumentos |
 |------|-----------|------------|
@@ -1105,7 +1105,7 @@ bvp_process_memory_bytes{type="rss"} 157286400
 | `analyze_responsive` | Testa layout responsivo em múltiplos viewports | `viewports?` |
 | `ui_responsive_matrix` | Testa em 8 viewports com matriz de responsividade | `customViewports?`, `screenshot?`, `checks?` |
 
-### Frontend e Componentes
+### Frontend & Components
 
 | Tool | Descrição | Argumentos |
 |------|-----------|------------|
@@ -1123,7 +1123,7 @@ bvp_process_memory_bytes{type="rss"} 157286400
 | `storybook_perf` | Mede performance de cada story (LCP, FCP, CLS) | `url`, `maxStories?` |
 | `storybook_visual_diff` | Teste de regressão visual no Storybook | `url`, `maxStories?`, `threshold?`, `updateBaselines?` |
 
-### SQL e Banco de Dados
+### SQL & Database
 
 | Tool | Descrição | Argumentos |
 |------|-----------|------------|
@@ -1133,7 +1133,7 @@ bvp_process_memory_bytes{type="rss"} 157286400
 | `sql_schema` | Inspeciona schema completo (tabelas, colunas, PKs, FKs, índices) | `label`, `includeRowCounts?` |
 | `sql_schema_export` | Exporta schema como Mermaid ER, Markdown ou JSON | `label`, `format?` |
 
-### Webhooks e Notificações
+### Webhooks & Notifications
 
 | Tool | Descrição | Argumentos |
 |------|-----------|------------|
@@ -1147,7 +1147,7 @@ bvp_process_memory_bytes{type="rss"} 157286400
 |------|-----------|------------|
 | `create_jira_issue` | Cria issue no Jira | `project`, `summary`, `description`, `priority?`, `labels?`, `issueType?` |
 
-### Sessões e Snapshots
+### Sessions & Snapshots
 
 | Tool | Descrição | Argumentos |
 |------|-----------|------------|
@@ -1160,14 +1160,14 @@ bvp_process_memory_bytes{type="rss"} 157286400
 | `test_visual_regression` | Regressão visual com baseline | `name`, `threshold?`, `fullPage?`, `updateBaseline?` |
 | `record_session` | Grava interações como script Playwright | `action`, `name?` |
 
-### Colaboração
+### Collaboration
 
 | Tool | Descrição | Argumentos |
 |------|-----------|------------|
 | `take_notes` | Gerencia anotações em issues | `action`, `issueKey?`, `author?`, `text?` |
 | `ask` | Exibe pergunta ao usuário e aguarda resposta | `question`, `context?` |
 
-### Testes Avançados
+### Advanced Testing
 
 | Tool | Descrição | Argumentos |
 |------|-----------|------------|
@@ -1179,7 +1179,7 @@ bvp_process_memory_bytes{type="rss"} 157286400
 | `install_extension` | Instala extensão Chrome de diretório local | `source`, `enableInIncognito?` |
 | `list_extensions` | Lista extensões Chrome instaladas | `enabled?` |
 
-### Utilitários
+### Utilities
 
 | Tool | Descrição | Argumentos |
 |------|-----------|------------|
@@ -1188,7 +1188,7 @@ bvp_process_memory_bytes{type="rss"} 157286400
 
 ---
 
-## Resources MCP
+## MCP Resources
 
 O servidor expõe **6 resources** no protocolo MCP (prefixo `browser://`):
 
@@ -1203,7 +1203,7 @@ O servidor expõe **6 resources** no protocolo MCP (prefixo `browser://`):
 
 ---
 
-## Prompts MCP
+## MCP Prompts
 
 | Prompt | Descrição | Argumentos |
 |--------|-----------|------------|
@@ -1212,7 +1212,7 @@ O servidor expõe **6 resources** no protocolo MCP (prefixo `browser://`):
 
 ---
 
-## Configuração
+## Configuration
 
 ### Variáveis de Ambiente
 
@@ -1235,7 +1235,7 @@ O servidor expõe **6 resources** no protocolo MCP (prefixo `browser://`):
 
 ---
 
-## API REST
+## REST API
 
 ### Endpoints
 
@@ -1272,7 +1272,7 @@ O servidor expõe **6 resources** no protocolo MCP (prefixo `browser://`):
 
 ---
 
-## MCP-Browser vs Alternativas
+## MCP-Browser vs Alternatives
 
 | Característica | MCP-Browser | Playwright | Puppeteer | Cypress |
 |---------------|-------------|------------|-----------|---------|
@@ -1301,7 +1301,7 @@ O servidor expõe **6 resources** no protocolo MCP (prefixo `browser://`):
 
 ---
 
-## Exemplos de Uso
+## Usage Examples
 
 ### MCP via SDK (Node.js)
 
@@ -1379,11 +1379,11 @@ Saída esperada:
 
 ---
 
-## Desenvolvimento
+## Development
 
-### Pré-requisitos
+### Prerequisites
 
-- Node.js >= 18 (recomendado 22+)
+- Node.js >= 18 (recommended 22+)
 - npm >= 8
 
 ### Setup
@@ -1398,30 +1398,30 @@ cd web && npm install && npm run build && cd ..  # Web UI (opcional)
 npm run build                  # Compila TypeScript
 ```
 
-### Comandos
+### Commands
 
 ```bash
-npm run dev                    # Desenvolvimento com hot-reload (tsx watch)
-npm start                      # Produção (node dist/index.js)
-npm run build                  # Compilar TypeScript
-npm test                       # Rodar 175 testes unitários
-npm run test:watch             # Testes em modo watch
-npm run typecheck              # Verificação de tipos
-npm run lint                   # Lint ESLint
-npm run format                 # Formatação Prettier
+npm run dev                    # Development with hot-reload (tsx watch)
+npm start                      # Production (node dist/index.js)
+npm run build                  # Compile TypeScript
+npm test                       # Run 175 unit tests
+npm run test:watch             # Watch mode tests
+npm run typecheck              # Type checking
+npm run lint                   # ESLint
+npm run format                 # Prettier formatting
 ```
 
-### Testes
+### Tests
 
-| Suite | Quantidade | O que cobre | Como rodar |
-|-------|-----------|-------------|------------|
-| **Unitários** | 175 testes | Tools individuais, infra corporativa, browser | `npm test` |
-| **E2E Web** | 24 testes | REST API + Web UI via Playwright | `npx vitest run --config vitest.e2e.config.ts` |
-| **MCP Real** | 147 testes | Protocolo MCP real via SDK (tools, resources, prompts, error handling, stress) | `node tests/test-mcp-comprehensive.mjs` |
+| Suite | Count | Coverage | How to run |
+|-------|-------|----------|------------|
+| **Unit** | 175 tests | Individual tools, corporate infra, browser | `npm test` |
+| **E2E Web** | 24 tests | REST API + Web UI via Playwright | `npx vitest run --config vitest.e2e.config.ts` |
+| **MCP Real** | 147 tests | Real MCP protocol via SDK (tools, resources, prompts, error handling, stress) | `node tests/test-mcp-comprehensive.mjs` |
 
 ---
 
-## Contribuindo
+## Contributing
 
 Veja o guia completo em [CONTRIBUTING.md](./CONTRIBUTING.md).
 
@@ -1435,13 +1435,13 @@ Veja o guia completo em [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Changelog
 
-Veja o histórico completo em [CHANGELOG.md](./CHANGELOG.md).
+See the full history at [CHANGELOG.md](./CHANGELOG.md).
 
-**Versão atual: 1.0.0** — 129 tools, dual transport, middleware pipeline, 147/147 testes MCP passando.
+**Current version: 1.0.0** — 129 tools, dual transport, middleware pipeline, 147/147 MCP tests passing.
 
 ---
 
-## Deploy
+## Deployment
 
 ### Docker
 
@@ -1463,7 +1463,7 @@ docker-compose up -d
   "mcpServers": {
     "bvp-browser": {
       "command": "node",
-      "args": ["/caminho/para/browser-mcp-server/dist/index.js"],
+      "args": ["/path/to/browser-mcp-server/dist/index.js"],
       "env": { "BROWSER_HEADLESS": "true" }
     }
   }
@@ -1472,15 +1472,15 @@ docker-compose up -d
 
 ---
 
-## Documentação Complementar
+## Additional Documentation
 
-Além deste README, o projeto inclui documentação técnica aprofundada em `docs/`:
+In addition to this README, the project includes in-depth technical documentation in `docs/`:
 
 ### Architecture Decision Records (ADR)
 
-Documentos que registram decisões arquiteturais significativas, com contexto, alternativas rejeitadas e consequências.
+Documents that record significant architectural decisions, with context, rejected alternatives, and consequences.
 
-| ADR | Decisão | Local |
+| ADR | Decision | Location |
 |-----|---------|-------|
 | ADR-001 | Dual Transport: MCP stdio + HTTP REST | `docs/adr/ADR-001-transport-selection.md` |
 | ADR-002 | Tool Auto-Discovery via Filesystem Scan | `docs/adr/ADR-002-auto-discovery.md` |
@@ -1488,61 +1488,61 @@ Documentos que registram decisões arquiteturais significativas, com contexto, a
 | ADR-004 | Dual Write: JSONL + SQLite para Auditoria | `docs/adr/ADR-004-sqlite-jsonl-dual-write.md` |
 | ADR-005 | Execução Serializada de Operações no Navegador | `docs/adr/ADR-005-serialized-execution.md` |
 
-### Runbook de Produção
+### Production Runbook
 
-Guia operacional para diagnóstico, recuperação e manutenção em produção:
+Operational guide for diagnosis, recovery, and production maintenance:
 `docs/runbook/production-runbook.md`
 
-- Como diagnosticar lentidão
-- O que fazer quando o navegador crashar
-- Como rotacionar logs
-- Como atualizar Playwright
-- Métricas de saúde (OK / Warning / Critical)
+- How to diagnose slowness
+- What to do when the browser crashes
+- How to rotate logs
+- How to update Playwright
+- Health metrics (OK / Warning / Critical)
 
 ### Benchmarks
 
-Dados de performance coletados em hardware de referência:
+Performance data collected on reference hardware:
 `docs/benchmarks/latency-benchmark.md`
 
-- Latência p50/p95/p99 por tool
+- p50/p95/p99 latency per tool
 - Throughput (tools/s)
-- Memória RSS por estado
+- RSS memory by state
 - Startup time
 
 ### Threat Model
 
-Análise de segurança STRIDE por componente:
+STRIDE security analysis per component:
 `docs/security/threat-model.md`
 
-- 15 threats mapeadas com severidade e mitigação
+- 15 threats mapped with severity and mitigation
 - Trust boundaries (Network, Process, Filesystem)
-- Recomendações para produção multi-tenant
+- Recommendations for multi-tenant production
 - Incident response
 
 ### Grafana Dashboard
 
-Dashboard JSON exportável para monitoramento:
+Exportable JSON dashboard for monitoring:
 `docs/monitoring/grafana-dashboard.json`
 
-- Painéis: request rate, tool latency, tool calls per tool, memory, error rate, uptime
+- Panels: request rate, tool latency, tool calls per tool, memory, error rate, uptime
 
 ### Alert Rules
 
-Regras Prometheus para alerta:
+Prometheus alerting rules:
 `docs/monitoring/alert-rules.yml`
 
-| Alerta | Severidade | Trigger |
-|--------|------------|---------|
-| HighErrorRate | critical | Error rate > 5% em 5min |
+| Alert | Severity | Trigger |
+|-------|----------|---------|
+| HighErrorRate | critical | Error rate > 5% in 5min |
 | HighToolLatency | warning | Tool latency > 2s |
 | HighMemoryUsage | warning | RSS > 800MB |
 | ServerRestarted | info | Uptime < 60s |
-| NoTraffic | warning | Zero requests em 5min |
-| ToolErrorRate | warning | Erro por tool > 10% |
+| NoTraffic | warning | Zero requests in 5min |
+| ToolErrorRate | warning | Error per tool > 10% |
 
 ---
 
-## Estrutura do Projeto
+## Project Structure
 
 ```
 browser-mcp-server/

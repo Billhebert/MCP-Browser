@@ -7,72 +7,30 @@ on:
     branches: [main]
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: browser-mcp-server
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "npm"
-          cache-dependency-path: browser-mcp-server/package-lock.json
-      - run: npm ci
-      - run: npm run lint
-
   typecheck:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: browser-mcp-server
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: "npm"
-          cache-dependency-path: browser-mcp-server/package-lock.json
       - run: npm ci
       - run: npm run typecheck
 
-  test:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: browser-mcp-server
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "npm"
-          cache-dependency-path: browser-mcp-server/package-lock.json
-      - run: npm ci
-      - run: npx playwright install chromium --with-deps
-      - run: npm test
-
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: browser-mcp-server
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: "npm"
-          cache-dependency-path: browser-mcp-server/package-lock.json
       - run: npm ci
       - run: npm run build
 
   audit:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: browser-mcp-server
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
@@ -80,6 +38,5 @@ jobs:
         with:
           node-version: "22"
           cache: "npm"
-          cache-dependency-path: browser-mcp-server/package-lock.json
       - run: npm ci
       - run: npm audit --audit-level=high

@@ -89,6 +89,7 @@ nav:
     - Security: tools/security.md
     - SQL & Database: tools/sql.md
     - Storybook: tools/storybook.md
+    - Intelligence: tools/intelligence.md
     - Frontend & Components: tools/frontend.md
     - Sessions & Snapshots: tools/sessions.md
     - Webhooks & Notifications: tools/webhooks.md

@@ -43,7 +43,7 @@
     "axe-core": "^4.12.1",
     "cors": "^2.8.6",
     "express": "^5.2.1",
-    "path-to-regexp": "^7.2.0",
+    "path-to-regexp": "^8.4.2",
     "pixelmatch": "^7.2.0",
     "playwright": "^1.62.0",
     "pngjs": "^7.0.0",

@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "mcp-browser": {
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": { "BROWSER_HEADLESS": "true" }
+    }
+  }
+}

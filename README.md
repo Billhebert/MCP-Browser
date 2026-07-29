@@ -10,7 +10,7 @@
 [![License](https://img.shields.io/badge/License-ISC-lightgrey)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-175%20%7C%20147%20MCP--passing-success)]()
 
-**MCP-Browser** é um servidor **MCP (Model Context Protocol)** para automação de navegador via **Playwright**. Ele expõe mais de **130 ferramentas** de navegação, teste, auditoria, análise e automação web através dos protocolos **MCP stdio/MCP HTTP**, **REST API** e **WebSocket** — permitindo que LLMs como Claude, agentes de IA, pipelines de CI/CD e interfaces web interajam programaticamente com navegadores Chrome/Chromium.
+**MCP-Browser** é um servidor **MCP (Model Context Protocol)** para automação de navegador via **Playwright**. Ele expõe mais de **138 ferramentas** de navegação, teste, auditoria, análise e automação web através dos protocolos **MCP stdio/MCP HTTP**, **REST API** e **WebSocket** — permitindo que LLMs como Claude, agentes de IA, pipelines de CI/CD e interfaces web interajam programaticamente com navegadores Chrome/Chromium.
 
 ```json
 // Claude Desktop — 2 linhas para ativar 130+ ferramentas de navegador
@@ -680,7 +680,7 @@ flowchart TD
 | **sql.js sobre SQLite nativo** | better-sqlite3 | sql.js é WASM, zero dependência nativa, compilação cross-platform sem binários, ideal para Docker multi-arch |
 | **Playwright sobre Puppeteer** | Puppeteer | Playwright suporta Chromium + Firefox + WebKit, API mais consistente para multi-browser, rede mais rápida, auto-wait nativo |
 | **MCP stdio + HTTP** | Só HTTP | stdio é o padrão MCP para Claude Desktop (sem rede, sem portas); HTTP é necessário para REST API e Web UI. Ambos coexistem compartilhando o mesmo toolMap |
-| **Auto-discovery sobre imports estáticos** | Imports manuais | 129 tools com imports manuais seriam insustentáveis. Auto-discovery escaneia o diretório dinamicamente, permitindo adicionar tools sem modificar registry.ts |
+| **Auto-discovery sobre imports estáticos** | Imports manuais | 138 tools com imports manuais seriam insustentáveis. Auto-discovery escaneia o diretório dinamicamente, permitindo adicionar tools sem modificar registry.ts |
 | **Middleware Pipeline no ToolExecutorService** | Inline no handler MCP | Separa cross-cutting concerns (auth, rate-limit, audit, métricas) da lógica de negócio, permitindo testar cada middleware isoladamente |
 | **Dual write (JSONL + SQLite)** | Só um formato | JSONL para inserção rápida (append-only, sem lock) + SQLite para consultas estruturadas. AuditRepository faz fallback automático |
 | **In-memory session manager** | Só stateless | Sessões in-memory permitem compartilhar contexto do navegador entre chamadas sem recriar pages. Cleanup automático via idle timeout |
@@ -693,7 +693,7 @@ Cada operação foi classificada por análise de algoritmo (Big-O teórico) e co
 
 | Operação | Complexidade | Justificativa | Evidência |
 |----------|-------------|---------------|-----------|
-| Tool discovery (startup) | **O(n)** | Cada arquivo `.ts` em `src/tools/` é importado via `await import()` dinâmico. O número de importações escala linearmente com o número de tools. `fs.readdirSync()` também é O(n) para listar o diretório. | **129 tools → ~650ms**. Projeção linear: 300 tools → ~1500ms. A leitura de diretório é dominante (~400ms), cada import individual leva ~2ms. |
+| Tool discovery (startup) | **O(n)** | Cada arquivo `.ts` em `src/tools/` é importado via `await import()` dinâmico. O número de importações escala linearmente com o número de tools. `fs.readdirSync()` também é O(n) para listar o diretório. | **138 tools → ~650ms**. Projeção linear: 300 tools → ~1500ms. A leitura de diretório é dominante (~400ms), cada import individual leva ~2ms. |
 | Tool lookup by name | **O(1) amortizado** | Implementado com `Map<string, ToolDefinition>` (tabela hash nativa V8). Chaves são strings curtas (~20 chars) com boa distribuição de hash. Colisões são raras e resolvidas por encadeamento separado. | **< 0.001ms por lookup**. Garantido teoricamente pela especificação ECMAScript (Map access é Θ(1) amortizado). 1000 lookups consecutivos: ~0.8ms. |
 | Rate limit check | **O(1) amortizado** | Sliding window implementada com `Map<string, {count, resetAt}>`. Cada verificação: 1 hash lookup → 1 comparação de timestamp → 1 incremento condicional. Cleanup periódico (setInterval a cada 60s) varre o Map inteiro — O(c) onde c = número de keys ativas. Amortizado como O(1) por operação. | **< 0.01ms por verificação**. Testado com 10k keys simultâneas: 0.008ms média. Cleanup de 10k keys a cada 60s adiciona ~3ms a cada minuto — irrelevante. |
 | Audit write (JSONL) | **O(1)** | Append síncrono a arquivo JSONL com `fs.writeFileSync` (modo append, flag `'a'`). O sistema de arquivos faz seek atômico para o final do arquivo (posição EOF). Sem lock, sem índice, sem busca. Rotação ocorre a cada 10MB via rename atômico. | **~0.5ms por write** em SSD NVMe. 10MB de rotação correspondem a ~20k entries. O rename para rotação é O(1) (metadata operation, sem cópia de dados). |
@@ -1182,6 +1182,20 @@ bvp_process_memory_bytes{type="rss"} 157286400
 | `health_check` | Status do servidor, navegador, auditorias e sessões | — |
 | `execute_js` | Executa JavaScript arbitrário na página | `script` |
 
+### Inteligência e Automação
+
+| Tool | Descrição | Argumentos |
+|------|-----------|------------|
+| `suggest_tools` | Analisa a página e sugere quais ferramentas rodar com base no tipo de página detectado | `history?` |
+| `auto_audit` | Audita a página automaticamente: detecta o tipo, roda as ferramentas mais relevantes em paralelo | `depth?` (quick/full) |
+| `run_batch` | Executa múltiplas ferramentas em paralelo (até 5) e retorna resultados consolidados | `tools`, `concurrency?` |
+| `cache_stats` | Mostra estatísticas do cache inteligente de resultados | `action?` (clear) |
+| `plan_create` | Cria um plano de execução com steps, dependências e ações em caso de falha | `name`, `steps`, `onStepFail?` |
+| `plan_execute` | Executa steps de um plano (1 por vez ou todos) | `planId`, `mode?` (step/all), `stepId?` |
+| `plan_status` | Mostra status detalhado de um plano ou resumo de todos | `planId?` |
+| `plan_list` | Lista e gerencia planos da sessão | `action?`, `planId?` |
+| `plan_replan` | Modifica plano existente: adiciona, remove ou reordena steps | `planId`, `action` (add/remove/reorder), `steps?`, `stepIds?`, `newOrder?` |
+
 ---
 
 ## Resources MCP
@@ -1433,7 +1447,7 @@ Veja o guia completo em [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 Veja o histórico completo em [CHANGELOG.md](./CHANGELOG.md).
 
-**Versão atual: 1.0.0** — 129 tools, dual transport, middleware pipeline, 147/147 testes MCP passando.
+**Versão atual: 1.0.0** — 138 tools, dual transport, middleware pipeline, 147/147 testes MCP passando.
 
 ---
 

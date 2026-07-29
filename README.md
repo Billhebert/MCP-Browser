@@ -111,41 +111,26 @@
 > Componentes e comunicação. Claude conversa com o MCP Server (via stdio ou HTTP), que coordena as ferramentas e o navegador Chromium via Playwright. Dados são persistidos em SQLite e JSONL. Serviços externos (Jira, Slack) recebem notificações.
 
 ```mermaid
-C4Context
-  title System Context — MCP-Browser
-
-  Person(claude, "Claude / LLM Agent", "Modelo de linguagem que consome MCP")
-  Person(dev, "Desenvolvedor", "Usa CLI, scripts ou navegador")
-  Person(user, "Usuário Final", "Interage via Web UI")
-
-  System_Boundary(mcpb, "MCP-Browser") {
-    Container(mcp, "MCP Server", "Node.js + SDK MCP", "Gerencia conexão com LLMs via stdio/HTTP")
-    Container(http, "HTTP Server", "Express + WebSocket", "REST API + Web UI + WS")
-    Container(engine, "Tool Engine", "Pipeline + Registry", "Executa ferramentas com middleware pipeline")
-    ContainerDb(db, "Database", "SQLite (sql.js)", "Persiste auditorias, settings, snapshots")
-    ContainerDb(fsdb, "File Store", "JSONL", "Audit trail e dados de sessão")
-  }
-
-  System_Boundary(browser, "Navegador") {
-    Container(cr, "Chromium", "Playwright", "Navegador headless/headed")
-    Container(ext, "Extensões", "Chrome", "Plugins instalados")
-  }
-
-  System_Ext(jira, "Jira API", "Criação de issues")
-  System_Ext(slack, "Slack Webhook", "Notificações")
-  System_Ext(discord, "Discord Webhook", "Notificações")
-  System_Ext(webhooks, "Webhooks Custom", "Eventos de auditoria")
-
-  Rel(claude, mcp, "tools/list, tools/call, resources/read", "JSON-RPC")
-  Rel(dev, http, "curl /api/tools, POST /api/execute", "REST")
-  Rel(user, http, "Dashboard, Playground", "Web UI")
-  Rel(http, mcp, "toolMap compartilhado", "In-process")
-  Rel(engine, cr, "navigate, click, screenshot...", "Playwright API")
-  Rel(engine, db, "insertAudit, saveSnapshot", "sql.js")
-  Rel(engine, fsdb, "writeAudit", "JSON Lines")
-  Rel(engine, webhooks, "POST on error", "HTTP")
-  Rel(engine, jira, "createIssue", "REST")
-  Rel(engine, slack, "sendMessage", "Webhook")
+flowchart LR
+  subgraph "Usuários"
+    C[Claude / LLM] -->|tools/list, tools/call| S[MCP Server]
+    D[Desenvolvedor] -->|curl /api/tools| A[HTTP Server]
+    U[Usuário Web] -->|Dashboard| A
+  end
+  subgraph "MCP-Browser"
+    S -->|compartilha toolMap| A
+    A --> E[Tool Engine]
+    E --> B[(SQLite)]
+    E --> J[(JSONL)]
+  end
+  subgraph "Navegador"
+    E -->|Playwright CDP| CR[Chromium]
+  end
+  subgraph "Externos"
+    E -.->|webhook| WH[Webhooks]
+    E -.->|createIssue| JIRA[Jira API]
+    E -.->|sendMessage| SL[Slack]
+  end
 ```
 
 ### Diagrama de Sequência — CallTool
@@ -155,8 +140,8 @@ C4Context
 ```mermaid
 sequenceDiagram
   participant C as Claude/Client
-  participant S as MCP Server<br/>(index.ts)
-  participant R as Registry<br/>(toolMap)
+  participant S as "MCP Server (index.ts)"
+  participant R as "Registry (toolMap)"
   participant P as Pipeline
   participant M as Middlewares
   participant T as Tool
@@ -550,15 +535,15 @@ classDiagram
 ```mermaid
 sequenceDiagram
   participant C as Client
-  participant S as MCP Server
+  participant S as "MCP Server"
   participant R as Registry
   participant FSA as fullSiteAudit Tool
   participant CP as Crawler
   participant P as Page Pool (concurrency=3)
-  participant A11y as check_a11y
-  participant SEO as analyze_seo
-  participant SEC as check_security
-  participant PERF as lighthouse_audit
+  participant A11y as "check_a11y"
+  participant SEO as "analyze_seo"
+  participant SEC as "check_security"
+  participant PERF as "lighthouse_audit"
 
   C->>S: CallTool: full_site_audit { url, maxPages: 10 }
   S->>R: toolMap.get("full_site_audit")

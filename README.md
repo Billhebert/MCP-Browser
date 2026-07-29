@@ -108,6 +108,8 @@
 
 ### Diagrama de Componentes (C4)
 
+> Componentes e comunicação. Claude conversa com o MCP Server (via stdio ou HTTP), que coordena as ferramentas e o navegador Chromium via Playwright. Dados são persistidos em SQLite e JSONL. Serviços externos (Jira, Slack) recebem notificações.
+
 ```mermaid
 C4Context
   title System Context — MCP-Browser
@@ -147,6 +149,8 @@ C4Context
 ```
 
 ### Diagrama de Sequência — CallTool
+
+> A ordem exata dos acontecimentos quando uma ferramenta é chamada. Linhas sólidas (→) são chamadas que esperam resposta; tracejadas (-->>) são "dispara e esquece". O fluxo é: autenticar → verificar limite → validar argumentos → executar no navegador → auditar → notificar (se erro) → responder.
 
 ```mermaid
 sequenceDiagram
@@ -205,6 +209,8 @@ sequenceDiagram
 
 ### Diagrama de Estados — Browser Session
 
+> Ciclo de vida do navegador. Ele nasce (launching), fica pronto (connected), executa tarefas (executing), e se ficar 5 minutos parado é fechado automaticamente (timeout → closed). Se a página quebrar, uma nova é criada na hora.
+
 ```mermaid
 stateDiagram-v2
   [*] --> closed
@@ -233,6 +239,8 @@ stateDiagram-v2
 ```
 
 ### Diagrama de Atividades — Pipeline
+
+> Fluxo de decisão de toda requisição. Antes de executar qualquer ferramenta, o servidor verifica autenticação e limite de taxa. Se falhar em qualquer passo, retorna erro sem executar. Após executar, registra auditoria e, se houve erro, notifica webhooks.
 
 ```mermaid
 flowchart TD
@@ -264,6 +272,8 @@ flowchart TD
 
 ### Diagrama de Implantação
 
+> Onde cada parte roda fisicamente. Claude Desktop se conecta via pipe. O servidor roda em Docker com Chromium embutido. Dados de auditoria e perfil do navegador ficam em volumes persistentes.
+
 ```mermaid
 flowchart LR
   subgraph "Claude Desktop"
@@ -287,6 +297,8 @@ flowchart LR
 ```
 
 ### Diagrama de Pacotes
+
+> Dependências entre os módulos do código. index.ts orquestra tudo. O registry descobre ferramentas automaticamente. O ToolExecutorService executa via um pipeline de middlewares. API REST e WebSocket compartilham o mesmo motor.
 
 ```mermaid
 flowchart LR
@@ -422,6 +434,8 @@ Quando o servidor inicia (`main()` em `index.ts`):
 
 ### Diagrama de Classes (C4 Nível 3)
 
+> Relacionamento entre as principais classes. Uma ToolDefinition tem execute() que retorna ToolResult. O Pipeline coordena Middlewares. ToolExecutorService é o orquestrador central. EventBus permite comunicação entre módulos sem acoplamento.
+
 ```mermaid
 classDiagram
   class ToolDefinition {
@@ -531,6 +545,8 @@ classDiagram
 
 ### Diagrama de Sequência — FullSiteAudit
 
+> Como funciona uma auditoria completa de site. O servidor descobre todas as URLs, executa ferramentas de auditoria em paralelo (até 3 páginas por vez), e no final agrega resultados em um dashboard consolidado.
+
 ```mermaid
 sequenceDiagram
   participant C as Client
@@ -583,6 +599,8 @@ sequenceDiagram
 ```
 
 ### Data Flow Diagram (DFD)
+
+> A jornada dos dados: requisição chega → passa por validação e segurança → ferramenta executa no navegador → resultado é auditado (escrito em JSONL e SQLite) → resposta volta para o cliente. Auditoria e webhooks são fire-and-forget.
 
 ```mermaid
 flowchart TD

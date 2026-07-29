@@ -108,6 +108,8 @@
 
 ### Component Diagram (C4)
 
+> How components connect. Claude talks to the MCP Server (via stdio or HTTP), which coordinates tools and the Chromium browser through Playwright. Data is persisted in SQLite and JSONL. External services (Jira, Slack) receive notifications.
+
 ```mermaid
 C4Context
   title System Context — MCP-Browser
@@ -147,6 +149,8 @@ C4Context
 ```
 
 ### Sequence Diagram — CallTool
+
+> The exact sequence when a tool is called. Solid lines (→) wait for a response; dashed lines (-->>) are fire-and-forget. Flow: authenticate → rate limit → validate args → execute in browser → audit → notify (if error) → respond.
 
 ```mermaid
 sequenceDiagram
@@ -205,6 +209,8 @@ sequenceDiagram
 
 ### State Diagram — Browser Session
 
+> Browser lifecycle. It starts (launching), becomes ready (connected), runs tasks (executing), and if idle for 5 minutes it's automatically closed (timeout → closed). If the page crashes, a new one is created immediately.
+
 ```mermaid
 stateDiagram-v2
   [*] --> closed
@@ -234,6 +240,8 @@ stateDiagram-v2
 
 ### Activity Diagram — Pipeline
 
+> Decision flow for every request. Before executing any tool, the server checks authentication and rate limits. If either fails, it returns an error without running the tool. After execution, it logs an audit and notifies webhooks on error.
+
 ```mermaid
 flowchart TD
   A[CallToolRequest] --> B{MetricsMiddleware.before}
@@ -262,7 +270,9 @@ flowchart TD
   W --> X[return isError]
 ```
 
-### Deploymentmentment Diagram
+### Deployment Diagram
+
+> Where each part runs physically. Claude Desktop connects via pipe. The server runs in Docker with Chromium embedded. Audit data and browser profile are stored in persistent volumes.
 
 ```mermaid
 flowchart LR
@@ -287,6 +297,8 @@ flowchart LR
 ```
 
 ### Package Diagram
+
+> Dependencies between code modules. index.ts orchestrates everything. The registry auto-discovers tools. ToolExecutorService runs tools through a middleware pipeline. REST API and WebSocket share the same engine.
 
 ```mermaid
 flowchart LR
@@ -422,6 +434,8 @@ Quando o servidor inicia (`main()` em `index.ts`):
 
 ### Class Diagram (C4 Level 3)
 
+> Relationships between the main classes. A ToolDefinition has execute() returning ToolResult. The Pipeline coordinates Middlewares. ToolExecutorService is the central orchestrator. EventBus enables module communication without coupling.
+
 ```mermaid
 classDiagram
   class ToolDefinition {
@@ -531,6 +545,8 @@ classDiagram
 
 ### Sequence Diagram — FullSiteAudit
 
+> How a full site audit works. The server discovers all URLs, runs audit tools in parallel (up to 3 pages at a time), then aggregates results into a consolidated dashboard.
+
 ```mermaid
 sequenceDiagram
   participant C as Client
@@ -583,6 +599,8 @@ sequenceDiagram
 ```
 
 ### Data Flow Diagram (DFD)
+
+> Data journey: request arrives → passes validation and security → tool executes in browser → result is audited (written to JSONL and SQLite) → response goes back to client. Audit and webhooks are fire-and-forget.
 
 ```mermaid
 flowchart TD

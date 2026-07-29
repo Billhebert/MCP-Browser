@@ -284,6 +284,7 @@ flowchart LR
   MCP --> A
   MCP --> P
   MCP -.->|webhook| EXT[Slack / Jira / Webhooks]
+```
 
 ### Diagrama de Pacotes
 

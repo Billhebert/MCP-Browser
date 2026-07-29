@@ -837,17 +837,17 @@ flowchart LR
     T2[HTTP com CORS]
   end
   subgraph "Layer 2: SSRF Protection"
-    S1[isSafeUrl()]
+    S1["isSafeUrl()"]
     S2[Block localhost, RFC1918]
-    S3[Only http/https]
+    S3["Only http/https"]
   end
   subgraph "Layer 3: Authentication"
     A1[BVP_API_KEY]
-    A2[HMAC rotational keys]
+    A2["HMAC rotational keys"]
   end
   subgraph "Layer 4: Rate Limiting"
-    R1[60 req/min/user+tool]
-    R2[Sliding window]
+    R1["60 req/min/user+tool"]
+    R2["Sliding window"]
   end
   subgraph "Layer 5: Input Validation"
     V1[Zod schemas]
@@ -856,11 +856,11 @@ flowchart LR
   end
   subgraph "Layer 6: Data Masking"
     M1[Screenshot auto-mask]
-    M2[Passwords, emails, CC]
+    M2["Passwords, emails, CC"]
   end
   subgraph "Layer 7: Output Sanitization"
     O1[Webhook secret masking]
-    O2[Regex: /password|token|api_key/]
+    O2["Regex: /password|token|api_key/"]
   end
 
   T1 --> S1

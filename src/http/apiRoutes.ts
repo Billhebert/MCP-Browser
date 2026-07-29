@@ -67,6 +67,7 @@ export function setupApiRoutes(app: Express) {
     const auth = validateApiKey(apiKey || undefined);
     if (!auth.valid) throw new AuthError();
 
+    await ensureTools();
     const { result } = await executor.execute({ toolName: name, args, user: auth.user, sessionId });
 
     res.json({

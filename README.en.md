@@ -265,35 +265,25 @@ flowchart TD
 ### Deploymentmentment Diagram
 
 ```mermaid
-deploymentDiagram
-  node "Claude Desktop" as cd
-  node "CI/CD Pipeline" as ci
-  node "Servidor Linux" as host {
-    node "Docker" as docker {
-      container "MCP-Browser" as mcpb {
-        artifact "dist/index.js" as app
-        artifact "web/dist/" as web
-      }
-    }
-    container "Volume: bvp-data" as vol {
-      storage "/data/audit" as audit
-      storage "/home/.bvp-browser" as profile
-      storage "/home/.bvp-browser-profile" as session
-    }
-  }
-
-  node "Navegador" as browser {
-    component "Chromium" as cr
-  }
-
-  cd --> mcpb: MCP stdio (pipe)
-  ci --> mcpb: MCP stdio / HTTP
-  browser --> mcpb: ws://host:3100/ws
-  web --> browser: HTTP
-
-  mcpb --> vol: mounts
-  mcpb --> cr: Playwright CDP
-```
+flowchart LR
+  subgraph "Claude Desktop"
+    CD[Claude / LLM Agent]
+  end
+  subgraph "Docker Container"
+    MCP[MCP-Browser Server]
+  end
+  subgraph "Volumes"
+    A[(Audit Data)]
+    P[(Browser Profile)]
+  end
+  subgraph "Browser"
+    CR[Chromium]
+  end
+  CD -->|MCP stdio| MCP
+  MCP -->|Playwright CDP| CR
+  MCP --> A
+  MCP --> P
+  MCP -.->|webhook| EXT[Slack / Jira / Webhooks]
 
 ### Package Diagram
 

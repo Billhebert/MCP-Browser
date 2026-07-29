@@ -20,7 +20,8 @@
   },
   "homepage": "https://github.com/Billhebert/MCP-Browser#readme",
   "devDependencies": {
-    "husky": "^9.1.7",
-    "lint-staged": "^17.2.0"
+    "@types/node": "^22.13.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
   }
 }

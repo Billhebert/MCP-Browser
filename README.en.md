@@ -10,7 +10,7 @@
 [![License](https://img.shields.io/badge/License-ISC-lightgrey)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-175%20%7C%20147%20MCP--passing-success)]()
 
-**MCP-Browser** is an **MCP (Model Context Protocol)** server for browser automation via **Playwright**. It exposes **130+ tools** for navigation, testing, auditing, analysis, and web automation through **MCP stdio/MCP HTTP**, **REST API**, and **WebSocket** protocols — allowing LLMs like Claude, AI agents, CI/CD pipelines, and web interfaces to programmatically interact with Chrome/Chromium browsers.
+**MCP-Browser** is an **MCP (Model Context Protocol)** server for browser automation via **Playwright**. It exposes **138 tools** for navigation, testing, auditing, analysis, and web automation through **MCP stdio/MCP HTTP**, **REST API**, and **WebSocket** protocols — allowing LLMs like Claude, AI agents, CI/CD pipelines, and web interfaces to programmatically interact with Chrome/Chromium browsers.
 
 ```json
 // Claude Desktop — 2 lines to enable 130+ browser tools
@@ -680,7 +680,7 @@ flowchart TD
 | **sql.js sobre SQLite nativo** | better-sqlite3 | sql.js é WASM, zero dependência nativa, compilação cross-platform sem binários, ideal para Docker multi-arch |
 | **Playwright sobre Puppeteer** | Puppeteer | Playwright suporta Chromium + Firefox + WebKit, API mais consistente para multi-browser, rede mais rápida, auto-wait nativo |
 | **MCP stdio + HTTP** | Só HTTP | stdio é o padrão MCP para Claude Desktop (sem rede, sem portas); HTTP é necessário para REST API e Web UI. Ambos coexistem compartilhando o mesmo toolMap |
-| **Auto-discovery sobre imports estáticos** | Imports manuais | 129 tools com imports manuais seriam insustentáveis. Auto-discovery escaneia o diretório dinamicamente, permitindo adicionar tools sem modificar registry.ts |
+| **Auto-discovery sobre imports estáticos** | Imports manuais | 138 tools com imports manuais seriam insustentáveis. Auto-discovery escaneia o diretório dinamicamente, permitindo adicionar tools sem modificar registry.ts |
 | **Middleware Pipeline no ToolExecutorService** | Inline no handler MCP | Separa cross-cutting concerns (auth, rate-limit, audit, métricas) da lógica de negócio, permitindo testar cada middleware isoladamente |
 | **Dual write (JSONL + SQLite)** | Só um formato | JSONL para inserção rápida (append-only, sem lock) + SQLite para consultas estruturadas. AuditRepository faz fallback automático |
 | **In-memory session manager** | Só stateless | Sessões in-memory permitem compartilhar contexto do navegador entre chamadas sem recriar pages. Cleanup automático via idle timeout |
@@ -1431,7 +1431,7 @@ Veja o guia completo em [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 See the full history at [CHANGELOG.md](./CHANGELOG.md).
 
-**Current version: 1.0.0** — 129 tools, dual transport, middleware pipeline, 147/147 MCP tests passing.
+**Current version: 1.0.0** — 138 tools, dual transport, middleware pipeline, 147/147 MCP tests passing.
 
 ---
 

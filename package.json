@@ -27,7 +27,8 @@
     "@types/sql.js": "^1.4.11",
     "@types/ws": "^8.18.1",
     "tsx": "^4.23.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",

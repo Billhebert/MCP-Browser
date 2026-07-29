@@ -20,8 +20,25 @@
   },
   "homepage": "https://github.com/Billhebert/MCP-Browser#readme",
   "devDependencies": {
-    "@types/node": "^22.13.5",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.3"
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.20.1",
+    "@types/pngjs": "^6.0.5",
+    "@types/sql.js": "^1.4.11",
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.23.1",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "axe-core": "^4.12.1",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "pixelmatch": "^7.2.0",
+    "playwright": "^1.62.0",
+    "pngjs": "^7.0.0",
+    "sql.js": "^1.14.1",
+    "ws": "^8.21.1",
+    "zod": "^4.4.3"
   }
 }

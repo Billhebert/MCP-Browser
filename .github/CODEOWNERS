@@ -1,0 +1,10 @@
+# Revisão automática para todo o código
+* @Billhebert
+
+# Áreas específicas
+/src/tools/ @Billhebert
+/src/corporate/ @Billhebert
+/src/http/ @Billhebert
+/tests/ @Billhebert
+/docs/ @Billhebert
+*.md @Billhebert

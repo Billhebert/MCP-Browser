@@ -1,11 +1,11 @@
-FROM node:22-slim AS builder
+FROM node:25-slim AS builder
 WORKDIR /app
 COPY package*.json tsconfig.json ./
 RUN npm ci
 COPY src/ ./src/
 RUN npx tsc
 
-FROM node:22-slim AS runner
+FROM node:25-slim AS runner
 RUN apt-get update && apt-get install -y --no-install-recommends \
   chromium chromium-sandbox libnss3 libnspr4 libatk-bridge2.0-0 libdrm2 \
   libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 \
